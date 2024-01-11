@@ -1,0 +1,92 @@
+{% extends "index.html" %}
+{% block section %}
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script>  
+        function disableScroll() {
+    // body 요소의 overflow를 hidden으로 변경하여 스크롤 비활성화
+    document.body.style.overflow = 'hidden';
+    }
+
+    function enableScroll() {
+    // body 요소의 overflow를 다시 visible로 변경하여 스크롤 활성화
+    document.body.style.overflow = 'visible';
+    }
+    $(function(){
+      $("#confirm").click(function(){
+          //모달 닫기 함수 호출
+          modalClose();
+          enableScroll();
+          //컨펌 이벤트 처리
+      });
+      $("#modal-open").click(function(){        
+          $("#popup").css('display','flex').hide().fadeIn();
+          disableScroll();
+          //팝업을 flex속성으로 바꿔준 후 hide()로 숨기고 다시 fadeIn()으로 효과
+      });
+      $("#close").click(function(){
+          modalClose(); //모달 닫기 함수 호출
+          enableScroll();
+      });
+      function modalClose(){
+          $("#popup").fadeOut(); //페이드아웃 효과
+      }
+    });
+        </script>
+
+
+<h2>기존에 사용하는 제품을 입력해주세요</h2>
+<h4>입력하신 제품을 바탕으로 추천이 진행됩니다.</h4>
+
+<div class="GoToCenter">
+
+  <div class="modal-btn-box">
+      <button type="button" class="bigbutton" id="modal-open">제품 입력하기</button><br><br>
+  </div>
+
+  <div class="insert_list">
+    입력 리스트<br>
+    
+    <ul style="list-style-type: none; padding: 0; display: flex; align-items: center; justify-content: center;">
+        <li style="margin-right: 10px;">★</li>
+        <li style="margin-right: 10px;">제품 이름</li>
+        <li><button>삭제</button></li>
+    </ul>
+    
+     <ul style="list-style-type: none; padding: 0; display: flex; align-items: center; justify-content: center;">
+        <li style="margin-right: 10px;">★</li>
+        <li style="margin-right: 10px;">제품 이름</li>
+        <li><button>삭제</button></li>
+    </ul>
+    
+     <ul style="list-style-type: none; padding: 0; display: flex; align-items: center; justify-content: center;">
+        <li style="margin-right: 10px;">★</li>
+        <li style="margin-right: 10px;">제품 이름</li>
+        <li><button>삭제</button></li>
+    </ul>   
+</div>
+
+
+<!-- 입력창 팝업 -->
+<div class="container">
+  
+  <div class="popup-wrap" id="popup">
+    <div class="popup">
+          <div class="body-contentbox">
+            <p>입력하실 제품의 이름을 입력하세요</p><br>
+             <input type="text" placeholder="검색어 입력" style="font-size: 15px; width: 180px; height:30px; margin-right: 5px;"> <br>
+            <p>본인에게 해당 제품의 적합여부를 입력하세요</p>
+          </div>
+        
+        <div class="popup-foot">
+           <span class="pop-btn confirm" id="confirm">적합</span>
+           <span class="pop-btn close" id="close">부적합</span>
+      </div>
+    </div>
+      	  
+    </div>
+</div>
+
+</div>
+
+{% endblock section %}

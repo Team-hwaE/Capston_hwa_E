@@ -1,0 +1,92 @@
+{% extends "index.html" %}
+{% block section %}
+
+<head>
+  <style>  
+    /* ul li태그에 리스트 스타일을 없앰 */
+	ul li{
+		list-style: none;
+	}
+/* a태그에 텍스트 밑줄을 없애고 색상을 #333 */
+	a {
+		text-decoration: none;
+		color:#333;
+	}
+      /*
+      #menu {
+		font:bold 16px "malgun gothic";
+		width:700px;
+		height:50px;
+		background: #ccc;
+		color:black;
+		line-height: 50px; 
+		margin:0 auto;
+		text-align: center;
+	}*/
+
+/* menu태그 자식의 ul의 자식 li를 왼쪽정렬과 넓이 140설정 */
+	#menu > ul > li {
+		float:left;
+		width:140px;
+		position:relative;
+        margin:20px;
+        
+	}
+      
+      #menu > ul > li > ul {
+		width:130px;
+		display:none;
+		position: absolute;
+		font-size:14px;  
+        padding-left: 0;
+        
+	}
+      
+      #menu > ul > li > ul > li {
+		margin-right:10px;
+	}
+      
+      #menu > ul > li:hover > ul {	
+        display:flex;
+        flex-direction: row;     
+	}
+    </style>
+</head>
+
+<h2>
+    원하는 카테고리를 선택해주세요
+</h2><br>
+<div id="menu">
+	<ul>
+		<li><a href="#">스킨케어</a>
+			<ul>
+				<li><a href="#">SUB_MENU</a></li>
+				<li><a href="#">SUB_MENU2</a></li>
+				<li><a href="#">SUB_MENU3</a></li>
+			</ul>
+		</li><br>
+		<li><a href="#">클렌징/필링</a>
+			<ul>
+				<li><a href="#">SUB_MENU</a></li>
+				<li><a href="#">SUB_MENU2</a></li>
+				<li><a href="#">SUB_MENU3</a></li>
+			</ul>
+		</li><br>
+		<li><a href="#">마스크팩</a>
+			<ul>
+				<li><a href="#">SUB_MENU</a></li>
+				<li><a href="#">SUB_MENU2</a></li>
+				<li><a href="#">SUB_MENU3</a></li>
+			</ul>
+		</li><br>
+        <li><a href="#">선케어</a>
+			<ul>
+				<li><a href="#">SUB_MENU</a></li>
+				<li><a href="#">SUB_MENU2</a></li>
+				<li><a href="#">SUB_MENU3</a></li>
+			</ul>
+		</li><br>
+		
+	</ul>
+    
+    {% endblock section %}
