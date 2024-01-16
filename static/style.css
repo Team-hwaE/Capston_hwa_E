@@ -1,3 +1,38 @@
+@font-face {
+  font-family: 'DreamLight';
+  font-weight:300;
+  src: url('../static/font/LotteDreamLight.woff2') format('font-woff2');
+}
+
+@font-face {
+  font-family: 'LotteMartDream';
+  font-style: normal;
+  font-weight: 400;
+  src: url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamMedium.woff2') format('woff2'), url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamMedium.woff') format('woff');
+}
+@font-face {
+  font-family: 'LotteMartDream';
+  font-style: normal;
+  font-weight: 700;
+  src: url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamBold.woff2') format('woff2'), url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamBold.woff') format('woff');
+}
+@font-face {
+  font-family: 'LotteMartDream';
+  font-style: normal;
+  font-weight: 300;
+  src: url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamLight.woff2') format('woff2'), url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamLight.woff') format('woff');
+}
+.lottemartdream * {
+ font-family: 'LotteMartDream', sans-serif;
+}
+
+
+body {
+	font-family: 'LotteMartDream';
+  background-color:#F0F0EB;;
+}
+
+
 #screen {
     align-content:center;
     align-items:center;
@@ -8,7 +43,6 @@
     margin-right:auto;
     overflow: hidden;
     touch-action: none;
-
 }
 
 
@@ -71,15 +105,38 @@ nav a {
     font-size: 13px;
 }
 
-button .bigbutton {
+.bigbutton {
+  font-family: LotteMartDream;
   display: flex; 
-  align-items: center; 
-  justify-content: center;
+  padding: 15px;
+  border-radius: 20px;
+  border: 2px solid #A2AA7B;
+  background-color:transparent; /* 초록색 */
+  color: #564A57; /* 텍스트 색상 */
+  font-size: 16px; /* 원하는 폰트 크기로 설정 */
+  cursor: pointer;
+  margin:5% auto;
+  margin-top: 0;
+  display: block;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
 }
 
+.deleteButton {
+  background-color: transparent;
+  border-radius: 20px;
+  border: 1px solid #A2AA7B;
+  padding:5px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
 /* Insert_product 제품입력페이지 CSS */
 h2,h4 {
     text-align:center;
+    font-family: LotteMartDream;
+    color: #424242;
 }
 
 .insert_list {
@@ -93,6 +150,10 @@ h2,h4 {
       align-items: center;
       flex-direction: column;
       text-align: center;
+
+      margin:auto;
+    border-radius:20px;
+      background-color: rgba(255,255,255, 0.8);
 }
 
 .insert_list ul {
@@ -100,17 +161,7 @@ h2,h4 {
   padding: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-
-.insert_list ul li {
-  margin-right: 10px;
-}
-
-/* 만약 각각의 li를 좌측 정렬하고 싶지 않다면 아래와 같이 수정할 수 있습니다. */
-.insert_list ul li {
-  margin-right: 10px;
-  text-align: left;
+  justify-content: flex-start;
 }
 
 /* 팝업 */

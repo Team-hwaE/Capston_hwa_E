@@ -5,15 +5,21 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1, maximum-scale=1" />
         <title>Home</title>
         <link rel="stylesheet" href="{{ url_for('static', filename='./style.css')}}" />
-    
+        <style>
+            body {
+            background-color:#F0F0EB;
+            }
+        </style>
     </head>
 <body>
     
-<h2>
-    홈화면
-</h2>
-<button><a href="/Insert">
-    맞춤 추천받기</a>
+
+<img src="/static/image/logo_skintree.png" style="margin-top: 20%; width:100%;">
+<button class="bigbutton home" onclick="window.location.href='/Insert'">
+    이메일을 입력해주세요
+</button>
+<button class="bigbutton home" onclick="window.location.href='/Insert'">
+    맞춤 추천받기
 </button>
     
     </body>
