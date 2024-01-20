@@ -3,31 +3,23 @@
 
 <head>
   <style>  
-    /* ul li태그에 리스트 스타일을 없앰 */
+    /*
 	ul li{
 		list-style: none;
 	}
-/* a태그에 텍스트 밑줄을 없애고 색상을 #333 */
+
 	a {
 		text-decoration: none;
 		color:#333;
 	}
-      /*
-      #menu {
-		font:bold 16px "malgun gothic";
-		width:700px;
-		height:50px;
-		background: #ccc;
-		color:black;
-		line-height: 50px; 
-		margin:0 auto;
-		text-align: center;
-	}*/
+
 	#memu {
 		font-size: 25px;
+		padding-left:none;
 	}
-
+*/
 /* menu태그 자식의 ul의 자식 li를 왼쪽정렬과 넓이 140설정 */
+/*
 	#menu > ul > li {
 		float:left;
 		width:140px;
@@ -54,12 +46,14 @@
         display:flex;
         flex-direction: row;     
 	}
+	*/
     </style>
 </head>
 
 <h2>
     원하는 카테고리를 선택해주세요
 </h2><br>
+<!--
 <div id="menu">
 	<ul>
 		<li><a href="#">스킨케어</a>
@@ -92,5 +86,57 @@
 		</li><br>
 		
 	</ul>
+-->
+
+	<div class="big_Category">
+		<div id="cate_name">
+			# 스킨케어
+		</div>
+		<div id="category">
+			<ul>
+				<li>스킨/토너</li>
+				<li>로션</li>
+				<li>에센스/앰플</li>
+				<li>크림</li>
+			</ul>
+		</div>
+	</div>
     
+	<div class="big_Category">
+		<div id="cate_name">
+			# 클렌징/필링
+		</div>
+		<div id="category">
+			<ul>
+				<li>클렌징폼/젤</li>
+				<li>오일/워터/리무버</li>
+				<li>필링/패드</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="big_Category">
+		<div id="cate_name">
+			# 마스크팩
+		</div>
+		<div id="category">
+			<ul>
+				<li>시트팩</li>
+				<li>패드</li>
+				<li>페이셜팩</li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="big_Category">
+		<div id="cate_name">
+			# 선케어
+		</div>
+		<div id="category">
+			<ul>
+				<li>선블럭</li>
+				<li>태닝/애프터선</li>
+			</ul>
+		</div>
+	</div>
     {% endblock section %}
