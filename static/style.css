@@ -165,6 +165,13 @@ h2,h4 {
   justify-content: flex-start;
 }
 
+.insert_list .pd_name {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* 팝업 */
 
 .container{
