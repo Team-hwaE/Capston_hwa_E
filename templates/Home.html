@@ -11,16 +11,14 @@
             }
         </style>
     </head>
-<body>
-    
-
-<img src="/static/image/logo_skintree.png" style="margin-top: 20%; width:100%;">
-<button class="bigbutton home" onclick="window.location.href='/Insert'">
-    이메일을 입력해주세요
-</button>
-<button class="bigbutton home" onclick="window.location.href='/Insert'">
-    맞춤 추천받기
-</button>
-    
+    <body>
+        <img src="/static/image/logo_skintree.png" style="margin-top: 20%; width:100%;">
+        <form action="/submit_email" enctype="multipart/form-data" method="post">
+            <input type="text" class="bigbutton" placeholder="이메일을 입력하세요" name="email">
+        
+        <button class="bigbutton" onclick="window.location.href='/Insert'">
+            맞춤 추천받기
+        </button>
+        </form>
     </body>
 </html>

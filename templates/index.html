@@ -31,3 +31,70 @@
         </footer>    
     </div>
 </html>
+
+
+<!--FORM HTML 형식-->
+<!--<form action="/submit_item_post" enctype="multipart/form-data" method="post">
+     등록할 상품 관련 정보 입력 
+    <table class="form-table">
+        <tr>
+         
+            <th><label for="name">상품명</label></th>
+            <td><input type="text" name="name" id="name" placeholder="상품명을 입력해주세요" required /></td>
+        </tr>
+        <tr>
+        
+            <th><label for="price">가격</label></th>
+            <td><input type="text" name="price" id="price" placeholder="가격을 입력해주세요 ex) 1000" required /></td>
+        </tr>
+        <tr>
+            
+            <th><label for="img">상품 이미지</label></th>
+            <td><input type="file" name="file" /></td>
+        </tr>
+        <tr>
+         
+            <th><label for="keyword">상품 키워드 </label></th>
+            <td><input type="text" name="keyword" id="keyword" placeholder="상품 키워드를 1개 입력해주세요 ('#' 사용금지)" required /></td>
+        </tr>
+        <tr>
+           
+            <th><label for="status">상태</label></th>
+            <td>
+                <input type="radio" id="new" name="status" value="새 상품" required />
+                <label for="new">새 상품</label>
+                <input type="radio" id="lnew" name="status" value="미개봉 중고" required />
+                <label for="lnew">미개봉 중고</label>
+                <input type="radio" id="used" name="status" value="중고" required />
+                <label for="used">중고</label>
+            </td>
+        </tr>
+        <tr>
+      
+            <th><label for="explan">상세 설명 </label></th>
+            <td><textarea id="explain" name="explain" rows="4" cols="80" placeholder="상세 설명을 입력해주세요"></textarea></td>
+        </tr>
+        <tr>
+   
+            <th><label for="addr">판매지역</label></th>
+            <td><input type="text" name="addr" id="addr" placeholder="판매 지역을 입력해주세요 ex) 이화여대, 북아현동" required /></td>
+        </tr>
+        <tr>
+ 
+            <th><label for="send" id="send">전달 방식</label></th>
+			<td>
+			    <input type="radio" id="direct" name="send" value="직거래" required />
+			    <label for="direct">직거래</label>
+			    <input type="radio" id="delivery" name="send" value="배송" required />
+			    <label for="delivery">배송</label>
+			</td>
+        </tr>
+    </table>
+   
+    <input id="openkakao" name="openkakao" style="visibility: visible; opacity: 0;" value="{{session['openkakao']}}" />
+    
+    <div id="submitButtonContainer">
+        <input id="submitButton" type="submit" value="등록하기" />
+    </div>
+</form>
+-->

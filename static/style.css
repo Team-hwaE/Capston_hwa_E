@@ -106,7 +106,7 @@ nav a {
     font-size: 13px;
 }
 
-.bigbutton {
+.bigbutton{
   font-family: LotteMartDream;
   display: flex; 
   padding: 15px;
@@ -117,12 +117,15 @@ nav a {
   font-size: 16px; /* 원하는 폰트 크기로 설정 */
   cursor: pointer;
   margin:5% auto;
-  margin-top: 0;
   display: block;
   width: 90%;
   margin-left: auto;
   margin-right: auto;
   text-align: center;
+}
+
+input.bigbutton {
+  width: 80%; /* 추가된 부분: input 요소의 너비를 100%로 설정 */
 }
 
 .deleteButton {
