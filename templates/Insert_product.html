@@ -42,30 +42,7 @@
   <div class="modal-btn-box">
       <button type="button" class="bigbutton" id="modal-open">제품 입력하기</button><br><br>
   </div>
-<!--
-  <div class="insert_list">
-    입력 리스트<br>
-    
-    <ul>
-        <li style="margin-right: 10px;">★</li>
-        <li style="margin-right: 10px;">제품 이름</li>
-        <li><button class="deleteButton">삭제</button></li>
-    </ul>
-    
-     <ul>
-        <li style="margin-right: 10px;">★</li>
-        <li style="margin-right: 10px;">제품 이름</li>
-        <li><button class="deleteButton">삭제</button></li>
-    </ul>
-    
-     <ul>
-        <li style="margin-right: 10px;">★</li>
-        <li style="margin-right: 10px;">제품 이름</li>
-        <li><button class="deleteButton">삭제</button></li>
-    </ul>   
-  </div>
 
--->
 
 <div class="insert_list">
   <table width="100%">
@@ -75,18 +52,18 @@
       </tr>
     </thead>
     <tbody align="left">
-    {% for product in products %}
+    {% for i in products %}
       <tr>
-          <td>{% if product.fitness == 'Good' %}
+          <td>{% if i[2] == 'Good' %}
                   <span style="color: blue;">★</span>
-              {% elif product.fitness == 'Bad' %}
+              {% elif i[2] == 'Bad' %}
                   <span style="color: red;">★</span>
               {% else %}
                   <span style="color: black;">★</span>
               {% endif %}
           </td>
           <!--productID 출력말고 Name 으로 변경하기 -->
-         <td class="pd_name">{{ product.productName }}</td>
+         <td class="pd_name">{{ i[1] }}</td>
          <td align="right"><button class="deleteButton" onclick="">삭제</button></td>
       </tr>
     {% endfor %}

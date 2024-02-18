@@ -1,8 +1,25 @@
 {% extends "index.html" %}
 {% block section %}
+<script>
+     let getLink = window.location.search;
+        let getUserName = getLink.split('=');	//getLink를 '='를 기준으로 두 배열 요소로 분리
+        let getOnlyName = getUserName[1];
+        	//분리한 배열 중 두번째 요소 변수에 넣기
+        let decodeName = decodeURI(getOnlyName)
+        console.log(getUserName);
+        console.log(getOnlyName);
+
+
+        window.onload = function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var category = urlParams.get('category');
+            if (category) {
+                document.getElementById('categoryDisplay').innerText = "선택한 카테고리: " + decodeURIComponent(category);
+            }
+    }
+</script>
 
 <h2>성분 프렌즈 추천 BEST 3</h2>
-
 <div class="recommend_list">
     <ol>
         <li>에스트라 아토베리어365 크림</li>
@@ -12,4 +29,6 @@
 </div>
 <button class="bigbutton" onclick="window.location.href='/next?current_page={{ current_page }}'">다시 추천받기</button>
 </button>
+
+<div id="categoryDisplay"></div>
 {% endblock section %}
