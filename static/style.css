@@ -1,0 +1,357 @@
+@font-face {
+  font-family: 'DreamLight';
+  font-weight:300;
+  src: url('../static/font/LotteDreamLight.woff2') format('font-woff2');
+}
+
+@font-face {
+  font-family: 'LotteMartDream';
+  font-style: normal;
+  font-weight: 400;
+  src: url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamMedium.woff2') format('woff2'), url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamMedium.woff') format('woff');
+}
+@font-face {
+  font-family: 'LotteMartDream';
+  font-style: normal;
+  font-weight: 700;
+  src: url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamBold.woff2') format('woff2'), url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamBold.woff') format('woff');
+}
+@font-face {
+  font-family: 'LotteMartDream';
+  font-style: normal;
+  font-weight: 300;
+  src: url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamLight.woff2') format('woff2'), url('//cdn.jsdelivr.net/korean-webfonts/1/corps/lottemart/LotteMartDream/LotteMartDreamLight.woff') format('woff');
+}
+.lottemartdream * {
+ font-family: 'LotteMartDream', sans-serif;
+}
+
+
+body {
+	font-family: 'LotteMartDream';
+  background-color:#F0F0EB;;
+}
+
+
+#screen {
+    align-content:center;
+    align-items:center;
+    max-width:393px;
+    max-height:852px;
+    min-width:320px;
+    margin-left:auto;
+    margin-right:auto;
+    overflow: hidden;
+    touch-action: none;
+}
+
+
+#mainview {
+    height: auto;
+    min-height: 100%;
+    margin-bottom: 40%;
+}
+/*
+footer{
+      background-color:red;
+      height:10%;
+      position : relative;
+      transform : translateY(-100%);
+}
+*/
+ footer {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background-color: #f1f1f1;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 50px;
+      box-shadow: 0px -1px 5px 0px rgba(0, 0, 0, 0.1);
+     flex-direction: row;
+    }
+
+    .footer button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+nav {
+    position: fixed;
+    bottom: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 430px;
+    background-color: rgba(255,255,255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 60px;
+    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.1);
+    
+}
+nav a {
+    text-decoration: none;
+    color: #A2AA7B;
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+}
+
+.bigbutton{
+  font-family: LotteMartDream;
+  display: flex; 
+  padding: 15px;
+  border-radius: 20px;
+  border: 2px solid #A2AA7B;
+  background-color:transparent; /* 초록색 */
+  color: #564A57; /* 텍스트 색상 */
+  font-size: 16px; /* 원하는 폰트 크기로 설정 */
+  cursor: pointer;
+  margin:5% auto;
+  display: block;
+  width: 90%;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+input.bigbutton {
+  width: 80%; /* 추가된 부분: input 요소의 너비를 100%로 설정 */
+}
+
+.deleteButton {
+  background-color: transparent;
+  border-radius: 20px;
+  border: 1px solid #A2AA7B;
+  padding:5px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+/* Insert_product 제품입력페이지 CSS */
+h2,h4 {
+    text-align:center;
+    font-family: LotteMartDream;
+    color: #424242;
+}
+
+.insert_list {
+  width:80%;
+  border: 1px solid #ccc;
+    padding: 15px;
+    max-width: 300px;
+
+    display: flex;
+    justify-content:  space-around; 
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+
+    margin:auto;
+    border-radius:20px;
+    background-color: rgba(255,255,255, 0.8);    
+}
+
+.insert_list ul {
+  list-style-type: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.insert_list .pd_name {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 팝업 */
+
+.container{
+    width:100%;
+    height:600vh;
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+.popup-wrap{
+  background-color:rgba(0,0,0,.2); 
+  justify-content:center;
+  align-items:center;
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  bottom:0;
+  display:none; 
+  padding:15px;
+}
+
+.popup{
+  font-size:18px;
+  font-family: FontAwesome;
+  width:100%;
+  background-color:#ffffff;
+  border-radius:20px;
+  overflow:hidden; 
+  box-shadow: 5px 10px 10px 1px rgba(0,0,0,.3);
+  margin:auto;
+  flex-direction: column;
+}
+
+
+.body-contentbox{
+  word-break:break-word;
+  overflow-y:auto;
+  min-height:350px;
+  /*max-height:200px;*/
+  height:auto;
+  text-align:center;
+}
+
+.popup-foot{
+  width:100%;
+  height:50px;
+  margin-top: auto;
+}
+/*
+.pop-btn{
+  display:inline-flex;
+  width:49.5%;
+  height:100%;
+  float:left;
+  justify-content:center;
+  align-items:center;
+  color:#000000;
+  cursor:pointer;
+  border-top: 1px solid #000000;
+}
+.pop-btn.confirm{
+  border-right:1px solid #000000;
+}
+
+.modal-btn-box{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+*/
+
+
+.search input {
+  width: 85%;
+  height:40px;
+  border: 1px solid #bbb;
+  border-radius: 12px;
+  padding: 6px 10px;
+  font-size: 14px;
+  margin:auto;
+
+}
+
+.GnB_Button {
+  width:40%;
+  font-size: 18px;
+  background-color: #A2AA7B;
+  border-radius: 15px;
+  border:1px solid #A2AA7B;
+  color:#ffffff;
+  padding:10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Select_category 페이지 */
+.big_Category {
+  color:#564A57;
+  width:85%;
+  border:1px solid rgba(162, 170, 123, .5);
+  align-items: center;
+  margin:auto;
+  background-color: rgba(255,255,255, 0.8);
+  margin-bottom: 3%;
+}
+
+#cate_name {
+  padding-top:20px;
+  padding-left:20px;
+  font-size: 17px;
+  border-bottom: 1px solid rgba(162, 170, 123, .5);
+  padding-bottom: 20px;
+}
+
+#category ul {
+  display: flex;
+}
+
+#category ul li {
+  margin-right: 20px;
+  font-size: 12px;
+}
+
+/* Recommend 페이지 */
+
+.recommend_list {
+  width:85%;
+  border: 1px solid #ccc;
+  justify-content:  space-around; 
+  margin:auto;
+  border-radius:20px;
+  background-color: rgba(255,255,255, 0.8);
+  word-break: keep-all;
+  margin-bottom: 15%;
+}
+
+.recommend_list ol {
+  list-style-position: inside;
+  display: inline-block;
+  word-break: keep-all;
+  font-size: 20px;
+  line-height: 2;
+  padding-left:0;
+}
+
+.recommend_list ol li {
+  padding: 8px;
+  padding-left: 20px;
+  border-bottom: 2px solid rgba(162, 170, 123, .5); 
+}
+
+.recommend_list ol li:last-child {
+  border-bottom: none;
+}
+
+/*
+
+.recommend_list ol{
+  display:inline-block;
+  word-break: keep-all;
+  font-size: 20px;
+  line-height: 2;
+}
+
+
+.recommend_list ol li {
+  
+  border-bottom: 3px solid #ddd;
+  padding:none;
+}
+
+ol li:last-child {
+  border-bottom: none
+}
+*/

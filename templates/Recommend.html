@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block section %}
+
+<h2>성분 프렌즈 추천 BEST 3</h2>
+
+<div class="recommend_list">
+    <ol>
+        <li>에스트라 아토베리어365 크림</li>
+        <li>닥터지 레드 블레미쉬 클리어 수딩크림</li>
+        <li>바이오더마 시카비오 포마드</li>
+    </ol>
+</div>
+<button class="bigbutton" onclick="window.location.href='/next?current_page={{ current_page }}'">다시 추천받기</button>
+</button>
+{% endblock section %}
