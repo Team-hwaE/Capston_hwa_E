@@ -71,6 +71,59 @@ def Insert():
     return render_template("Insert_product.html",user_email=user_email, current_page='Insert_product.html',products=result, product=product, user=user)
 
 
+@application.route("/submit_feedback", methods=["POST"])
+def submit_feedback():
+
+    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
+    cursor = db.cursor()
+
+    # 클라이언트로부터 데이터 받기
+    user_email = session.get('user_email', None)
+    product_name = request.form.get("product_name")
+    fitness = request.form.get("fitness")
+    print(f"제품명 확인 {product_name}")
+    print(f"적합 확인 {fitness}")
+    # user 테이블에서 이메일로부터 userID 가져오기
+    user_id_query = "SELECT userID FROM user WHERE email = %s"
+    cursor.execute(user_id_query, (user_email,))
+    user_id_result = cursor.fetchone()
+
+    if user_id_result:
+        user_id = user_id_result[0]
+        
+        # product 테이블에서 productName으로부터 productID 가져오기
+        product_id_query = "SELECT productID FROM product WHERE productName = %s"
+        cursor.execute(product_id_query, (product_name,))
+        product_id_result = cursor.fetchone()
+        print(f"제품명 아이디 확인 {product_id_result}")
+        if product_id_result:
+            product_id = product_id_result[0]
+
+            print(f"제품명 아이디 확인2 {product_id_result[0]}")     
+            # 중복 여부 확인
+            check_query = "SELECT COUNT(*) FROM user WHERE userID = %s AND productID = %s"
+            cursor.execute(check_query, (user_id, product_id))
+            count_result = cursor.fetchone()
+
+            if count_result[0] == 0:
+                # user table에 데이터 입력하기
+                insert_query = "INSERT INTO user (userID, email, productID, fitness) VALUES (%s, %s, %s, %s)"
+                cursor.execute(insert_query, (user_id, user_email, product_id, fitness))
+                db.commit()
+
+                return redirect(url_for('Insert'))
+            else:
+                update_query = "UPDATE user SET fitness = %s WHERE userID = %s AND productID = %s"
+                cursor.execute(update_query, (fitness, user_id, product_id))
+                db.commit()
+
+                return redirect(url_for('Insert',current_page=request.path))
+        else:
+            return "Product not found."
+    else:
+        return "User not found."
+    
+
 @application.route("/delete_product/<int:product_id>")
 def delete_product(product_id):
     # 데이터베이스 연결
@@ -86,6 +139,7 @@ def delete_product(product_id):
 
     # Database 닫기
     cursor.close()
+    db.close()
 
     # 다시 Insert 페이지로 리다이렉트 또는 필요한 페이지로 리다이렉트
     return redirect(url_for('Insert'))
@@ -143,7 +197,7 @@ def update_user_ingredient():
 @application.route('/Recommend')
 def Recommend():
     category = request.args.get('category','')
-    # user ingredient 리스트 만드는 함수 실행
+    # user ingredient 리스트 만드는 함수 실행 
     update_user_ingredient()
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
     # category 변수에 저장되어있음
@@ -156,6 +210,22 @@ def Recommend():
 def Restart():
     return render_template('Restart.html', current_page='Restart.html')
 
+
+@application.route("/back")
+def back():
+    current_page = request.args.get('current_page', '')
+    print(f"Moving from {current_page} to...")
+    if current_page == 'Insert_product.html':
+        return redirect(url_for('hello'))
+    elif current_page == 'Select_category.html':
+        return redirect(url_for('Insert'))
+    elif current_page == 'Recommend.html':
+        return redirect(url_for('Select_category'))
+    elif current_page == 'Restart.html':
+        return redirect(url_for('Recommend'))
+    else:
+        return redirect(url_for('hello'))
+    
 
 @application.route("/next")
 def next():

@@ -3,7 +3,7 @@
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>  
-        function disableScroll() {
+    function disableScroll() {
     // body 요소의 overflow를 hidden으로 변경하여 스크롤 비활성화
     document.body.style.overflow = 'hidden';
     }
@@ -13,98 +13,180 @@
     document.body.style.overflow = 'visible';
     }
     $(function(){
+      /*
       $("#confirm").click(function(){
           //모달 닫기 함수 호출
           modalClose();
           enableScroll();
           //컨펌 이벤트 처리
+          
       });
+      */
       $("#modal-open").click(function(){        
           $("#popup").css('display','flex').hide().fadeIn();
           disableScroll();
           //팝업을 flex속성으로 바꿔준 후 hide()로 숨기고 다시 fadeIn()으로 효과
       });
-      $("#close").click(function(){
-          modalClose(); //모달 닫기 함수 호출
-          enableScroll();
+      
+      $("#closepopup").click(function(){
+        $("#popup").fadeOut();
+        enableScroll();
+        document.getElementById("product_name").value = "";
+        document.getElementById("Good").checked = false;
+        document.getElementById("Bad").checked = false;
       });
+
+      $(".Insert").click(function(){
+        $("form").submit();
+        $("#popup").fadeOut();
+        enableScroll();   
+      });
+    
       function modalClose(){
           $("#popup").fadeOut(); //페이드아웃 효과
-      }
+      } 
     });
-        </script>
+</script>
+
+<style>
+
+</style>
+
 
 
 <h2>기존에 사용하는 제품을 입력해주세요</h2>
 <h4>입력하신 제품을 바탕으로 추천이 진행됩니다.</h4>
 
 
-  <div class="modal-btn-box">
-      <button type="button" class="bigbutton" id="modal-open">제품 입력하기</button><br><br>
-  </div>
-
+<div class="modal-btn-box">
+  <button type="button" class="bigbutton" id="modal-open">제품 입력하기</button><br><br>
+</div>
 
 <div class="insert_list">
   <table width="100%">
-    <thead>
+    <thead style="display: table; width: 100%; margin-bottom:6px;">
       <tr align="center">
         <th colspan="3">입력 리스트</th>
       </tr>
     </thead>
-    <tbody align="left">
+    <tbody align="left" style="display:block; overflow: scroll; max-height:250px;">
     {% for i in products %}
-      <tr>
-          <td>{% if i[2] == 'Good' %}
-                  <span style="color: blue;">★</span>
+      <tr style="display: table; width: 100%;">
+          <td>
+            <div style="float: left; margin-right: 6px;">
+              {% if i[2] == 'Good' %}
+                  <span style="color: #65A5EA;">★</span>
               {% elif i[2] == 'Bad' %}
-                  <span style="color: red;">★</span>
+                  <span style="color: #EB85AF;">★</span>
               {% else %}
                   <span style="color: black;">★</span>
               {% endif %}
+            </div>
+          
+            <div class="pd_name" style="float: left; width: calc(100% - 120px);"> <!-- 나머지 공간을 차지하도록 설정 -->
+              {{ i[1] }}
+            </div>
+          
+            <div style="float: right;">
+              <button class="deleteButton" onclick="location.href='/delete_product/{{i[3]}}';">삭제</button>
+            </div>
           </td>
-          <!--productID 출력말고 Name 으로 변경하기 -->
-         <td class="pd_name">{{ i[1] }}</td>
-         <td align="right"><button class="deleteButton" onclick="">삭제</button></td>
+      </tr>
+    {% endfor %} 
+    </tbody>
+  </table>
+</div>
+
+  <p>현재 이메일: {{ user_email }}</p>
+
+
+
+<!-- 입력창 팝업 -->
+<div class="container">
+  <form action="/submit_feedback" enctype="multipart/form-data" method="post">
+    <div class="popup-wrap" id="popup">
+      <div class="popup">
+        <div class="body-contentbox">
+            <br><br>
+            <p>입력하실 제품의 이름을 입력하세요</p>
+            <!--Datalist는 내용 수정 가능-->
+            <div class="search">
+              <input type="text" placeholder="화장품 이름으로 찾아보기" list="searchOptions" id="product_name" name="product_name">
+            </div>
+            <datalist id="searchOptions" size="10">
+              {% for i in product %}
+                <option value="{{i[0]}}"></option>
+              {% endfor %}
+            </datalist>           
+            <br>
+            <p>본인에게 해당 제품의 적합여부를 선택하세요</p>
+            <!--
+            <p class="GnB_Button">
+              <input type="radio" id="confirm" name="fitness" class="Gn_Button pop-btn confirm" value="Good">
+              <label for="confirm">적합</label>
+              <input type="radio" id="close" name="fitness" class="Gn_Button pop-btn close" value="Bad">
+              <label for="close">부적합</label>
+            </p>
+            -->
+            <div class='radioButtonStyle'>
+              <label class='radioStyle'>
+                  <input type="radio" id="Good" name="fitness" value="Good"/>
+                  <label for="Good">적합</label>
+              </label>
+          
+              <label class='radioStyle'>
+                  <input type="radio" id="Bad" name="fitness" value="Bad"/>
+                  <label for="Bad">부적합</label>
+              </label>
+            </div>
+            <p>
+              <button type="submit" class="Insert pop-btn">입력하기</button>
+              <!--<input id="submitButton" type="submit" value="등록하기" />
+              <button id="closepopup" type="button">X</button>-->
+              <button id="closepopup" type="button">입력취소</button>
+            </p>
+          </div>
+       </div>
+    </div>
+  </form>
+</div>
+
+
+
+
+{% endblock section %}
+
+
+
+<!--
+<div class="insert_list">
+  <table width="100%">
+    <thead style="display: table; width: 100%;">
+      <tr align="center">
+        <th colspan="3">입력 리스트</th>
+      </tr>
+    </thead>
+    <tbody align="left" style="display:block; overflow: scroll; max-height:100px;">
+    {% for i in products %}
+      <tr style="display: table; width: 100%;">
+          <td>
+            <div style="float:left;">
+            {% if i[2] == 'Good' %}
+                  <span style="color: #65A5EA;">★</span>
+            {% elif i[2] == 'Bad' %}
+                  <span style="color: #EB85AF;">★</span>
+            {% else %}
+                  <span style="color: black;">★</span>
+            {% endif %}</div>
+          </td>
+
+        
+         <td class="pd_name"><div style="float:left; width: calc(100% - 120px);">{{ i[1] }}</div></td>
+         <td align="right"><button class="deleteButton" onclick="location.href='/delete_product/{{i[3]}}';">삭제</button></td>
       </tr>
     {% endfor %}
    
     </tbody>
   </table>
   </div>
-  <p>현재 이메일: {{ user_email }}</p>
-
-
-
-
-<!-- 입력창 팝업 -->
-<div class="container">
-  <form action="/submit_item_post" enctype="multipart/form-data" method="post">
-  <div class="popup-wrap" id="popup">
-    <div class="popup">
-          <div class="body-contentbox">
-            <br><br>
-            <p>입력하실 제품의 이름을 입력하세요</p><br>
-            <div class="search">
-              <input type="text" placeholder="화장품 이름으로 찾아보기">
-            </div>
-            <br>
-            <p>본인에게 해당 제품의 적합여부를 입력하세요</p>
-            <p>
-              <button class="GnB_Button pop-btn confirm" id="confirm">적합</button>
-              <button class="GnB_Button pop-btn close" id="close">부적합</button>
-            </p>
-          </div>
-        <!-- 적합 부적합 버튼
-        <div class="popup-foot">
-           <span class="pop-btn confirm" id="confirm">적합</span>
-           <span class="pop-btn close" id="close">부적합</span>
-      </div>
-      -->
-     </div>
-    </div>
-    </form>
-</div>
-
-</div>
-
-{% endblock section %}
+-->

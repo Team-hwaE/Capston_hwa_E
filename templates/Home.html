@@ -10,15 +10,16 @@
             background-color:#F0F0EB;
             }
         </style>
+
+
     </head>
     <body>
         <img src="/static/image/logo_skintree.png" style="margin-top: 20%; width:100%;">
         <form action="/submit_email" enctype="multipart/form-data" method="post">
-            <input type="text" class="bigbutton" placeholder="이메일을 입력하세요" name="email">
-        
-        <button class="bigbutton" onclick="window.location.href='/Insert'">
-            맞춤 추천받기
-        </button>
+            <input type="email" class="bigbutton" placeholder="이메일을 입력하세요" name="email">
+            <button class="bigbutton" onclick="window.location.href='/Insert'">
+                맞춤 추천받기
+            </button>
         </form>
     </body>
 </html>
