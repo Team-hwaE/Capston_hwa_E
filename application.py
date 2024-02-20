@@ -83,6 +83,7 @@ def submit_feedback():
     fitness = request.form.get("fitness")
     print(f"제품명 확인 {product_name}")
     print(f"적합 확인 {fitness}")
+
     # user 테이블에서 이메일로부터 userID 가져오기
     user_id_query = "SELECT userID FROM user WHERE email = %s"
     cursor.execute(user_id_query, (user_email,))
@@ -90,38 +91,47 @@ def submit_feedback():
 
     if user_id_result:
         user_id = user_id_result[0]
+    else:
+        # 새로운 사용자이므로 새로운 userID 생성
+        max_user_id_query = "SELECT MAX(userID) FROM user"
+        cursor.execute(max_user_id_query)
+        max_user_id_result = cursor.fetchone()
+        if max_user_id_result[0]:
+            user_id = max_user_id_result[0] + 1
+        else:
+            user_id = 1    
         
         # product 테이블에서 productName으로부터 productID 가져오기
-        product_id_query = "SELECT productID FROM product WHERE productName = %s"
-        cursor.execute(product_id_query, (product_name,))
-        product_id_result = cursor.fetchone()
-        print(f"제품명 아이디 확인 {product_id_result}")
-        if product_id_result:
-            product_id = product_id_result[0]
+    product_id_query = "SELECT productID FROM product WHERE productName = %s"
+    cursor.execute(product_id_query, (product_name,))
+    product_id_result = cursor.fetchone()
+    print(f"제품명 아이디 확인 {product_id_result}")
+    if product_id_result:
+        product_id = product_id_result[0]
 
-            print(f"제품명 아이디 확인2 {product_id_result[0]}")     
-            # 중복 여부 확인
-            check_query = "SELECT COUNT(*) FROM user WHERE userID = %s AND productID = %s"
-            cursor.execute(check_query, (user_id, product_id))
-            count_result = cursor.fetchone()
+        print(f"제품명 아이디 확인2 {product_id_result[0]}")     
+        # 중복 여부 확인
+        check_query = "SELECT COUNT(*) FROM user WHERE userID = %s AND productID = %s"
+        cursor.execute(check_query, (user_id, product_id))
+        count_result = cursor.fetchone()
 
-            if count_result[0] == 0:
-                # user table에 데이터 입력하기
-                insert_query = "INSERT INTO user (userID, email, productID, fitness) VALUES (%s, %s, %s, %s)"
-                cursor.execute(insert_query, (user_id, user_email, product_id, fitness))
-                db.commit()
+        if count_result[0] == 0:
+            # user table에 데이터 입력하기
+            insert_query = "INSERT INTO user (userID, email, productID, fitness) VALUES (%s, %s, %s, %s)"
+            cursor.execute(insert_query, (user_id, user_email, product_id, fitness))
+            db.commit()
 
-                return redirect(url_for('Insert'))
-            else:
-                update_query = "UPDATE user SET fitness = %s WHERE userID = %s AND productID = %s"
-                cursor.execute(update_query, (fitness, user_id, product_id))
-                db.commit()
-
-                return redirect(url_for('Insert',current_page=request.path))
+            return redirect(url_for('Insert'))
         else:
-            return "Product not found."
+            update_query = "UPDATE user SET fitness = %s WHERE userID = %s AND productID = %s"
+            cursor.execute(update_query, (fitness, user_id, product_id))
+            db.commit()
+
+            return redirect(url_for('Insert',current_page=request.path))
     else:
-        return "User not found."
+        return "Product not found."
+    
+    
     
 
 @application.route("/delete_product/<int:product_id>")
