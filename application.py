@@ -71,8 +71,8 @@ def Insert():
     return render_template("Insert_product.html",user_email=user_email, current_page='Insert_product.html',products=result, product=product, user=user)
 
 
-@application.route("/submit_feedback", methods=["POST"])
-def submit_feedback():
+@application.route("/insert_product", methods=["POST"])
+def insert_product():
 
     db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
     cursor = db.cursor()
@@ -101,7 +101,7 @@ def submit_feedback():
         else:
             user_id = 1    
         
-        # product 테이블에서 productName으로부터 productID 가져오기
+    # product 테이블에서 productName으로부터 productID 가져오기
     product_id_query = "SELECT productID FROM product WHERE productName = %s"
     cursor.execute(product_id_query, (product_name,))
     product_id_result = cursor.fetchone()
@@ -209,7 +209,9 @@ def Recommend():
     category = request.args.get('category','')
     # user ingredient 리스트 만드는 함수 실행 
     update_user_ingredient()
+    
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
+
     # category 변수에 저장되어있음
     print(f"선택한 카테고리 {category}")
     return render_template('Recommend.html', current_page='Recommend.html')
