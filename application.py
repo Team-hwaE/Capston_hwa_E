@@ -4,11 +4,102 @@ import sys
 import pymysql
 import mysql.connector
 from database import DBhandler
+import re
 
 application = Flask(__name__)
 application.secret_key = 'your_secret_key'
 
 db = DBhandler()
+
+
+db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
+cursor = db.cursor()
+
+def jaccard_similarity(set1, set2):
+        intersection = len(set1.intersection(set2))
+        union = len(set1.union(set2))
+        return intersection / union if union != 0 else 0
+
+def calculate_jaccard_similarity(user_input, ingredients_list):
+        # 쉼표로 구분된 재료를 리스트로 변환
+        ingredients_list = ingredients_list.strip("[]")  # 대괄호 제거
+        ingredients_list = re.sub(r'\[|\]', '', ingredients_list)
+        print(f"대괄호제거 리스트 테스트 {ingredients_list}")
+        ingredients_list.replace("'", "").split(", ")
+        #ingredients_list = ingredients_list.split(", ")  # 쉼표와 공백으로 분할하여 리스트로 변환
+        print(f"작은 따옴표, 공백 제거, 쉼표 구분 리스트 테스트 {ingredients_list}")
+    
+
+        # 각 단어에서 따옴표 제거하고 집합에 추가
+        ingredients_list_set = set(ingredients_list)
+        print(f"진짜 리스트 테스트 {ingredients_list_set}")
+        # for ingredient in ingredients_list:
+        # ingredients_list_set.add(ingredient.strip("'"))  # 따옴표 제거 후 집합에 추가
+
+        # 쉼표로 구분된 재료를 집합으로 변환
+        #대괄호 제거
+        user_input = [item.strip("[]") for item in user_input]
+        # 작은 따옴표 제거 및 각 요소 분리
+        user_input = [word.strip("'") for item in user_input for word in item.split(",")]
+        # 공백 제거
+        user_input = [word.strip() for word in user_input]
+        # 공백 제거 후 집합으로 변환
+        user_input_set = set(user_input)
+
+        # print("user_input_set:", user_input_set)
+        # print("ingredients_list_set:", ingredients_list_set)
+        # 자카드 유사도 계산
+        return jaccard_similarity(user_input_set, ingredients_list_set)
+   
+
+def random_recommendation(user_category, user_input):
+        # 사용자의 카테고리와 일치하는 제품을 찾아야 함
+        cursor.execute("SELECT productId, productIngredients FROM product WHERE categoryID = %s", (user_category,))
+        products = cursor.fetchall()
+
+        highest_similarity = 0
+        most_similar_productID = None
+
+        # 각 제품의 유사도 계산 및 비교
+        for productID, productIngredients in products:
+            similarity = calculate_jaccard_similarity(user_input, productIngredients)
+            print("productID:", productID, "유사도:", similarity)  # 각 유사도 출력
+            if similarity > highest_similarity:
+                highest_similarity = similarity
+                most_similar_productID = productID
+        print("Most similar productID:", most_similar_productID)
+        return most_similar_productID
+
+def find_most_similar_user(user_input,user_category):
+        user_similarities = []
+        user_category=user_category
+
+        # useringredients 테이블에서 모든 행 가져오기
+        cursor.execute("SELECT userID, ingredientsList FROM useringredients")
+        result = cursor.fetchall()
+
+        # 각 행의 유사도 계산 및 비교
+        for userID, ingredientsList in result:
+            similarity = calculate_jaccard_similarity(user_input, ingredientsList)
+            user_similarities.append((userID, similarity))
+            # print("userID:", userID, "유사도:", similarity)  # 각 유사도 출력
+
+        # 유사도에 따라 내림차순 정렬
+        user_similarities.sort(key=lambda x: x[1], reverse=True)
+
+        # 상위 3명의 userID 추출
+        top_3_users = [userID for userID, sim in user_similarities[:3] if sim > 0.6]
+
+        if not top_3_users:
+            print("No users with similarity over 0.6. Recommending random product. \n")
+            return random_recommendation(user_category, user_input)
+
+        print("Top3 most similar userIDs:", top_3_users)
+        return top_3_users
+
+
+
+
 
 def get_initial_data():
     # 데이터베이스 연결
@@ -206,10 +297,55 @@ def update_user_ingredient():
 
 @application.route('/Recommend')
 def Recommend():
+    global user_category
     category = request.args.get('category','')
     # user ingredient 리스트 만드는 함수 실행 
+
     update_user_ingredient()
     
+    #useringredients 불러오기 (추후 따로 함수로 만들기)
+    user_email = session.get('user_email', None)
+    email = session.get('user_email')
+    user_category=category
+    
+    if user_email:
+        db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
+        cursor = db.cursor()
+
+        # 이메일을 사용하여 userID 검색
+        user_id_query = "SELECT userID FROM user WHERE email = %s"
+        cursor.execute(user_id_query, (email,))
+        user_id_result = cursor.fetchone()
+
+        if user_id_result:
+            user_id = user_id_result[0]
+
+            # userID를 사용하여 userIngredients의 ingredientsList 검색
+            ingredients_query = "SELECT ingredientsList FROM userIngredients WHERE userID = %s"
+            cursor.execute(ingredients_query, (user_id,))
+            ingredients_result = cursor.fetchone()
+
+            if ingredients_result:
+                ingredients_list = ingredients_result[0]
+                print(f"유저리스트 {ingredients_list}")
+
+                user_input = [ingredients_list]
+              
+
+                most_similar_userID = find_most_similar_user(user_input,user_category)
+                return render_template('Recommend.html', current_page='Recommend.html',most_similar_userID=most_similar_userID)
+            else:
+                return "User ingredients not found."
+        else:
+            return "User ID not found."
+    else:
+        return "User email not found in session."
+
+
+
+
+
+
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
 
     # category 변수에 저장되어있음
