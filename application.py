@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, flash
 from flask import redirect, url_for, session, jsonify
 import sys
 import pymysql
@@ -220,7 +220,7 @@ def insert_product():
 
             return redirect(url_for('Insert',current_page=request.path))
     else:
-        return "Product not found."
+        return redirect(url_for('Insert'))
     
     
     
@@ -382,7 +382,7 @@ def next():
     if current_page == 'Insert_product.html':
         return redirect(url_for('Select_category'))
     elif current_page == 'Select_category.html':
-        return redirect(url_for('Recommend'))
+        return redirect(url_for('Select_category'))
     elif current_page == 'Recommend.html':
         return redirect(url_for('Restart'))
     else:

@@ -4,49 +4,73 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script>  
     function disableScroll() {
-    // body 요소의 overflow를 hidden으로 변경하여 스크롤 비활성화
-    document.body.style.overflow = 'hidden';
+        // body 요소의 overflow를 hidden으로 변경하여 스크롤 비활성화
+        document.body.style.overflow = 'hidden';
     }
 
     function enableScroll() {
-    // body 요소의 overflow를 다시 visible로 변경하여 스크롤 활성화
-    document.body.style.overflow = 'visible';
+        // body 요소의 overflow를 다시 visible로 변경하여 스크롤 활성화
+        document.body.style.overflow = 'visible';
     }
-    $(function(){
-      /*
-      $("#confirm").click(function(){
-          //모달 닫기 함수 호출
-          modalClose();
-          enableScroll();
-          //컨펌 이벤트 처리
-          
-      });
-      */
-      $("#modal-open").click(function(){        
-          $("#popup").css('display','flex').hide().fadeIn();
-          disableScroll();
-          //팝업을 flex속성으로 바꿔준 후 hide()로 숨기고 다시 fadeIn()으로 효과
-      });
-      
-      $("#closepopup").click(function(){
-        $("#popup").fadeOut();
-        enableScroll();
-        document.getElementById("product_name").value = "";
-        document.getElementById("Good").checked = false;
-        document.getElementById("Bad").checked = false;
-      });
 
-      $(".Insert").click(function(){
-        $("form").submit();
-        $("#popup").fadeOut();
-        enableScroll();   
-      });
-    
-      function modalClose(){
-          $("#popup").fadeOut(); //페이드아웃 효과
-      } 
+    $(function(){
+        /*
+        $("#confirm").click(function(){
+            //모달 닫기 함수 호출
+            modalClose();
+            enableScroll();
+            //컨펌 이벤트 처리
+            
+        });
+        */
+        $("#modal-open").click(function(){        
+            $("#popup").css('display','flex').hide().fadeIn();
+            disableScroll();
+            //팝업을 flex속성으로 바꿔준 후 hide()로 숨기고 다시 fadeIn()으로 효과
+        });
+        
+        $("#closepopup").click(function(){
+            $("#popup").fadeOut();
+            enableScroll();
+            document.getElementById("product_name").value = "";
+            document.getElementById("Good").checked = false;
+            document.getElementById("Bad").checked = false;
+        });
+/*
+        $(".Insert").click(function(){
+            $("form").submit();
+            $("#popup").fadeOut();
+            enableScroll();   
+        });
+*/        
+        $("#insert_form").submit(function(event) {
+            // 폼의 기본 동작을 중지
+            event.preventDefault();
+            
+            // 입력된 제품명 가져오기
+            var productName = $("#product_name").val();
+            
+            // 제품명이 입력되었는지 확인
+            if (!productName.trim()) {
+                alert("제품명을 입력하세요.");
+                document.getElementById("product_name").value = "";
+                return;
+            }
+            
+            // 적합 여부가 선택되었는지 확인
+            if (!$("input[name='fitness']:checked").val()) {
+                alert("적합 여부를 선택하세요.");
+                document.getElementById("Good").checked = false;
+                document.getElementById("Bad").checked = false;
+                return;
+            }
+            
+            // 모든 조건을 통과하면 폼 제출
+            $(this).unbind('submit').submit();
+        });
     });
 </script>
+
 
 <style>
 
@@ -100,10 +124,9 @@
   <p>현재 이메일: {{ user_email }}</p>
 
 
-
 <!-- 입력창 팝업 -->
 <div class="container">
-  <form action="/insert_product" enctype="multipart/form-data" method="post">
+  <form id="insert_form" action="/insert_product" enctype="multipart/form-data" method="post">
     <div class="popup-wrap" id="popup">
       <div class="popup">
         <div class="body-contentbox">
