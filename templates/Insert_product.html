@@ -107,7 +107,7 @@
               {% endif %}
             </div>
           
-            <div class="pd_name" style="float: left; width: calc(100% - 120px);"> <!-- 나머지 공간을 차지하도록 설정 -->
+            <div class="pd_name" style="float: left; width: calc(100% - 50px);"> <!-- 나머지 공간을 차지하도록 설정 -->
               {{ i[1] }}
             </div>
           
@@ -138,7 +138,7 @@
             </div>
             <datalist id="searchOptions" size="10">
               {% for i in product %}
-                <option value="{{i[1]}}"></option>
+                <option value="{{i[5]}}"></option>
               {% endfor %}
             </datalist>           
             <br>

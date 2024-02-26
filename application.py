@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, flash, g
 from flask import redirect, url_for, session, jsonify
 import sys
 import pymysql
@@ -6,98 +6,147 @@ import mysql.connector
 from database import DBhandler
 import re
 
+
+
 application = Flask(__name__)
 application.secret_key = 'your_secret_key'
 
 db = DBhandler()
 
+def get_db():
+    if 'db' not in g:
+        g.db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
+    return g.db
+
+# 데이터베이스 연결 해제 함수
+@application.teardown_appcontext
+def close_db(error):
+    db = g.pop('db', None)
+    if db is not None:
+        db.close()
+
+# 모든 요청이 처리되기 전에 데이터베이스를 업데이트하는 함수
+@application.before_request
+def update_database():
+    db = get_db()
+    cursor = db.cursor()
 
 db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
 cursor = db.cursor()
 
+
+
+
 def jaccard_similarity(set1, set2):
-        intersection = len(set1.intersection(set2))
-        union = len(set1.union(set2))
-        return intersection / union if union != 0 else 0
+    intersection = len(set1.intersection(set2))
+    union = len(set1.union(set2))
+    return intersection / union if union != 0 else 0
+
 
 def calculate_jaccard_similarity(user_input, ingredients_list):
-        # 쉼표로 구분된 재료를 리스트로 변환
-        ingredients_list = ingredients_list.strip("[]")  # 대괄호 제거
-        ingredients_list = re.sub(r'\[|\]', '', ingredients_list)
-        print(f"대괄호제거 리스트 테스트 {ingredients_list}")
-        ingredients_list.replace("'", "").split(", ")
-        #ingredients_list = ingredients_list.split(", ")  # 쉼표와 공백으로 분할하여 리스트로 변환
-        print(f"작은 따옴표, 공백 제거, 쉼표 구분 리스트 테스트 {ingredients_list}")
-    
+    # 텍스트에서 이차원 리스트 추출
+    inner_lists = re.findall(r'\[.*?\]', ingredients_list)
 
-        # 각 단어에서 따옴표 제거하고 집합에 추가
-        ingredients_list_set = set(ingredients_list)
-        print(f"진짜 리스트 테스트 {ingredients_list_set}")
-        # for ingredient in ingredients_list:
-        # ingredients_list_set.add(ingredient.strip("'"))  # 따옴표 제거 후 집합에 추가
+    # 각 내부 리스트를 파이썬 리스트로 변환
+    text_to_lists = [eval(lst) for lst in inner_lists]
 
-        # 쉼표로 구분된 재료를 집합으로 변환
-        #대괄호 제거
-        user_input = [item.strip("[]") for item in user_input]
-        # 작은 따옴표 제거 및 각 요소 분리
-        user_input = [word.strip("'") for item in user_input for word in item.split(",")]
-        # 공백 제거
-        user_input = [word.strip() for word in user_input]
-        # 공백 제거 후 집합으로 변환
-        user_input_set = set(user_input)
+    # print(text_to_lists)
 
-        # print("user_input_set:", user_input_set)
-        # print("ingredients_list_set:", ingredients_list_set)
-        # 자카드 유사도 계산
-        return jaccard_similarity(user_input_set, ingredients_list_set)
-   
+    combined_ingList = set()
+    for sublist in text_to_lists:
+        for item in sublist:  # 수정: 사용자 입력도 리스트의 리스트가 아니므로 중첩 반복문 사용
+            combined_ingList.add(item.strip())
+
+    # 대괄호를 제거하고 하나의 리스트로 만들기
+    combined_userInput = set()
+    for sublist in user_input:
+        for item in sublist:  # 수정: 사용자 입력도 리스트의 리스트가 아니므로 중첩 반복문 사용
+            combined_userInput.add(item.strip())  # 수정: add 함수로 각 항목 추가
+
+    # print("user_input_set:", combined_userInput)
+    # print("ingredients_list_set:", combined_ingList, "\n")
+
+    # 자카드 유사도 계산
+    return jaccard_similarity(combined_userInput, combined_ingList)
 
 def random_recommendation(user_category, user_input):
-        # 사용자의 카테고리와 일치하는 제품을 찾아야 함
-        cursor.execute("SELECT productId, productIngredients FROM product WHERE categoryID = %s", (user_category,))
-        products = cursor.fetchall()
+    # 사용자의 카테고리와 일치하는 제품을 찾아야 함
+    cursor.execute("SELECT productId, productIngredients FROM product WHERE categoryID = %s", (user_category,))
+    products = cursor.fetchall()
 
-        highest_similarity = 0
-        most_similar_productID = None
+    highest_similarity = 0
+    most_similar_productID = None
 
-        # 각 제품의 유사도 계산 및 비교
-        for productID, productIngredients in products:
-            similarity = calculate_jaccard_similarity(user_input, productIngredients)
-            print("productID:", productID, "유사도:", similarity)  # 각 유사도 출력
-            if similarity > highest_similarity:
-                highest_similarity = similarity
-                most_similar_productID = productID
+    # 각 제품의 유사도 계산 및 비교
+    for productID, productIngredients in products:
+        similarity = calculate_jaccard_similarity(user_input, productIngredients)
+        print("productID:", productID, "유사도:", similarity)  # 각 유사도 출력
+        if similarity > highest_similarity:
+            highest_similarity = similarity
+            most_similar_productID = productID
+
+    if highest_similarity > 0.6:
         print("Most similar productID:", most_similar_productID)
-        return most_similar_productID
+    else:
+        print("No products with similarity over 0.6. No recommendation.\n")
 
-def find_most_similar_user(user_input,user_category):
-        user_similarities = []
-        user_category=user_category
 
-        # useringredients 테이블에서 모든 행 가져오기
-        cursor.execute("SELECT userID, ingredientsList FROM useringredients")
-        result = cursor.fetchall()
 
-        # 각 행의 유사도 계산 및 비교
-        for userID, ingredientsList in result:
-            similarity = calculate_jaccard_similarity(user_input, ingredientsList)
-            user_similarities.append((userID, similarity))
-            # print("userID:", userID, "유사도:", similarity)  # 각 유사도 출력
+def find_most_similar_user(user_input):
+    user_similarities = []
 
-        # 유사도에 따라 내림차순 정렬
-        user_similarities.sort(key=lambda x: x[1], reverse=True)
+    # useringredients 테이블에서 모든 행 가져오기
+    cursor.execute("SELECT userID, ingredientsList FROM useringredients")
+    result = cursor.fetchall()
 
-        # 상위 3명의 userID 추출
-        top_3_users = [userID for userID, sim in user_similarities[:3] if sim > 0.6]
+    # 각 행의 유사도 계산 및 비교
+    for userID, ingredientsList in result:
+        similarity = calculate_jaccard_similarity(user_input, ingredientsList)
+        user_similarities.append((userID, similarity))
+        print("userID:", userID, "유사도:", similarity)  # 각 유사도 출력
 
-        if not top_3_users:
-            print("No users with similarity over 0.6. Recommending random product. \n")
-            return random_recommendation(user_category, user_input)
+    # 유사도에 따라 내림차순 정렬
+    user_similarities.sort(key=lambda x: x[1], reverse=True)
 
+    # 상위 3명의 userID 추출
+    top_3_users = [userID for userID, sim in user_similarities[:3] if sim > 0.6]
+
+    # 반환된 top_3_users에 따라 조건부로 find_users_recommend_products 함수 호출
+    if top_3_users:
         print("Top3 most similar userIDs:", top_3_users)
-        return top_3_users
+        product_names = find_users_recommend_products(top_3_users, cursor, user_category)
+        return product_names
+    else:
+        print("No users with similarity over 0.6. Recommending random product.\n")
+        random_recommendation(user_category, user_input)
+        return None
 
 
+
+def find_users_recommend_products(top_3_users, cursor, user_category):
+    # 각 사용자에 대해 처리
+    for userID in top_3_users:
+        # fitness가 "good"이고 해당 사용자의 모든 productID를 찾음
+        cursor.execute("SELECT productID FROM user WHERE userID = %s AND fitness = 'good'", (userID,))
+        results = cursor.fetchall()  # 모든 행을 가져옴
+
+        product_names = []  # 추천 제품의 이름을 저장할 리스트
+        for result in results:
+            productID = result[0]  # 튜플의 첫 번째 요소가 productID
+            # productID를 사용하여 해당 제품의 productName과 categoryID를 가져옴
+            cursor.execute("SELECT productName, categoryID FROM product WHERE productID = %s", (productID,))
+            product_result = cursor.fetchone()
+            if product_result and product_result[1] == user_category:
+                productName = product_result[0]  # productName은 튜플의 첫 번째 요소
+                product_names.append(productName)  # productName을 리스트에 추가
+
+        # 최대 3개까지의 추천 제품 출력
+        if product_names:
+            print(f"UserID {userID}: Recommended products: {', '.join(product_names[:3])}")
+            return product_names[:3]
+        else:
+            print(f"UserID {userID}: No recommended product found for user_category {user_category}")
+            return None
 
 
 
@@ -148,7 +197,7 @@ def Insert():
     cursor = db.cursor()
 
     query = """
-    SELECT user.productID, product.productName, user.fitness, product.productID
+    SELECT user.productID, product.translated_productName, user.fitness, product.productID
     FROM user
     JOIN product ON user.productID = product.productID
     WHERE user.email = %s
@@ -193,7 +242,7 @@ def insert_product():
             user_id = 1    
         
     # product 테이블에서 productName으로부터 productID 가져오기
-    product_id_query = "SELECT productID FROM product WHERE productName = %s"
+    product_id_query = "SELECT productID FROM product WHERE translated_productName = %s"
     cursor.execute(product_id_query, (product_name,))
     product_id_result = cursor.fetchone()
     print(f"제품명 아이디 확인 {product_id_result}")
@@ -270,7 +319,6 @@ def update_user_ingredient():
 
             # productIngredients를 하나의 리스트로 합치기
             ingredients_list = ', '.join([row[0] for row in product_ingredients])
-            print(f"합친 성분리스트 {ingredients_list}")
             # 위에서 얻은 ingredientsList를 userIngredient 테이블에 저장
             # 이미 동일한 userID가 존재하는지 확인하는 쿼리
             query = "SELECT COUNT(*) FROM userIngredients WHERE userID = %s"
@@ -327,13 +375,19 @@ def Recommend():
 
             if ingredients_result:
                 ingredients_list = ingredients_result[0]
-                print(f"유저리스트 {ingredients_list}")
+               
+                #ingredients_list = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in ingredients_list]
 
                 user_input = [ingredients_list]
-              
+                user_input = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in user_input]
 
-                most_similar_userID = find_most_similar_user(user_input,user_category)
-                return render_template('Recommend.html', current_page='Recommend.html',most_similar_userID=most_similar_userID)
+                most_similar_userID = find_most_similar_user(user_input)
+                #find_users_recommend_products(most_similar_userID, cursor)
+                if most_similar_userID:
+                    return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=most_similar_userID,user_email=user_email)
+                else:
+                    return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=None,user_email=user_email)
+                
             else:
                 return "User ingredients not found."
         else:
