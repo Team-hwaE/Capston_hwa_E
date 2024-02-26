@@ -291,8 +291,37 @@ def delete_product(product_id):
     cursor.close()
     db.close()
 
+    delete_invalid_user_ingredients()
+
     # 다시 Insert 페이지로 리다이렉트 또는 필요한 페이지로 리다이렉트
     return redirect(url_for('Insert'))
+
+
+def delete_invalid_user_ingredients():
+    db = get_db()
+    cursor = db.cursor()
+
+    # 사용자Ingredients 테이블에서 모든 사용자 ID 가져오기
+    cursor.execute("SELECT userID FROM userIngredients")
+    user_ingredients_users = cursor.fetchall()
+    user_ingredients_users = set([user[0] for user in user_ingredients_users])
+
+    # 사용자 테이블에서 모든 사용자 ID 가져오기
+    cursor.execute("SELECT userID FROM user")
+    user_users = cursor.fetchall()
+    user_users = set([user[0] for user in user_users])
+
+    # 사용자Ingredients 테이블에서 사용자 ID가 존재하지 않는 경우 해당 레코드 삭제
+    invalid_users = user_ingredients_users - user_users
+    for user_id in invalid_users:
+        cursor.execute("DELETE FROM userIngredients WHERE userID = %s", (user_id,))
+
+    # 변경 사항 커밋
+    db.commit()
+
+    # 데이터베이스 및 커서 연결 종료
+    cursor.close()
+    db.close()
 
 
 @application.route('/Select_category')
