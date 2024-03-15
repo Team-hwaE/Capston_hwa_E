@@ -11,25 +11,9 @@ import re
 application = Flask(__name__)
 application.secret_key = 'your_secret_key'
 
-db = DBhandler()
+#db = DBhandler()
 
-def get_db():
-    if 'db' not in g:
-        g.db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    return g.db
 
-# 데이터베이스 연결 해제 함수
-@application.teardown_appcontext
-def close_db(error):
-    db = g.pop('db', None)
-    if db is not None:
-        db.close()
-
-# 모든 요청이 처리되기 전에 데이터베이스를 업데이트하는 함수
-@application.before_request
-def update_database():
-    db = get_db()
-    cursor = db.cursor()
 
 db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
 cursor = db.cursor()
@@ -104,6 +88,7 @@ def find_most_similar_user(user_input):
         similarity = calculate_jaccard_similarity(user_input, ingredientsList)
         user_similarities.append((userID, similarity))
         print("userID:", userID, "유사도:", similarity)  # 각 유사도 출력
+        #print(f"userID의 유저인풋{user_input}")
 
     # 유사도에 따라 내림차순 정렬
     user_similarities.sort(key=lambda x: x[1], reverse=True)
@@ -127,7 +112,7 @@ def find_users_recommend_products(top_3_users, cursor, user_category):
     # 각 사용자에 대해 처리
     for userID in top_3_users:
         # fitness가 "good"이고 해당 사용자의 모든 productID를 찾음
-        cursor.execute("SELECT productID FROM user WHERE userID = %s AND fitness = 'good'", (userID,))
+        cursor.execute("SELECT productID FROM user WHERE userID = %s AND fitness = 'Good'", (userID,))
         results = cursor.fetchall()  # 모든 행을 가져옴
 
         product_names = []  # 추천 제품의 이름을 저장할 리스트
@@ -168,6 +153,7 @@ def get_initial_data():
 
     # Database 닫기
     cursor.close()
+    db.close()
 
     return product, user
 
@@ -291,37 +277,11 @@ def delete_product(product_id):
     cursor.close()
     db.close()
 
-    delete_invalid_user_ingredients()
 
     # 다시 Insert 페이지로 리다이렉트 또는 필요한 페이지로 리다이렉트
     return redirect(url_for('Insert'))
 
 
-def delete_invalid_user_ingredients():
-    db = get_db()
-    cursor = db.cursor()
-
-    # 사용자Ingredients 테이블에서 모든 사용자 ID 가져오기
-    cursor.execute("SELECT userID FROM userIngredients")
-    user_ingredients_users = cursor.fetchall()
-    user_ingredients_users = set([user[0] for user in user_ingredients_users])
-
-    # 사용자 테이블에서 모든 사용자 ID 가져오기
-    cursor.execute("SELECT userID FROM user")
-    user_users = cursor.fetchall()
-    user_users = set([user[0] for user in user_users])
-
-    # 사용자Ingredients 테이블에서 사용자 ID가 존재하지 않는 경우 해당 레코드 삭제
-    invalid_users = user_ingredients_users - user_users
-    for user_id in invalid_users:
-        cursor.execute("DELETE FROM userIngredients WHERE userID = %s", (user_id,))
-
-    # 변경 사항 커밋
-    db.commit()
-
-    # 데이터베이스 및 커서 연결 종료
-    cursor.close()
-    db.close()
 
 
 @application.route('/Select_category')
@@ -404,12 +364,18 @@ def Recommend():
 
             if ingredients_result:
                 ingredients_list = ingredients_result[0]
-               
+            
                 #ingredients_list = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in ingredients_list]
-
-                user_input = [ingredients_list]
-                user_input = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in user_input]
-
+              
+                user_input = ingredients_list
+                
+                #예전 버전
+                #user_input = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in user_input]
+                user_input = '[' + user_input + ']'
+               
+                print(f"유저아이디{user_id}")
+                print(f"선택한 카테고리: {category}")
+                print(f"최종입력버전{user_input}")
                 most_similar_userID = find_most_similar_user(user_input)
                 #find_users_recommend_products(most_similar_userID, cursor)
                 if most_similar_userID:
@@ -431,7 +397,7 @@ def Recommend():
 
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
 
-    # category 변수에 저장되어있음
+    # category 변수에 저장되어있음 이 아래 실행안되는 부분임
     print(f"선택한 카테고리 {category}")
     return render_template('Recommend.html', current_page='Recommend.html')
 
