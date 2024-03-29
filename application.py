@@ -93,6 +93,7 @@ def find_most_similar_user(user_input):
 
     # 각 행의 유사도 계산 및 비교
     for userID, ingredientsList in result:
+        
         similarity = calculate_jaccard_similarity(user_input, ingredientsList)
         user_similarities.append((userID, similarity))
         print("userID:", userID, "유사도:", similarity)  # 각 유사도 출력
@@ -102,7 +103,9 @@ def find_most_similar_user(user_input):
     user_similarities.sort(key=lambda x: x[1], reverse=True)
 
     # 상위 3명의 userID 추출
-    top_3_users = [userID for userID, sim in user_similarities[:3] if sim > 0.6]
+    top_3_users = [userID for userID, sim in user_similarities[1:4] if sim > 0.6]
+
+    #top_3_users = top_3_users[1:]
 
     # 반환된 top_3_users에 따라 조건부로 find_users_recommend_products 함수 호출
     if top_3_users:
@@ -118,28 +121,41 @@ def find_most_similar_user(user_input):
 
 def find_users_recommend_products(top_3_users, cursor, user_category):
     # 각 사용자에 대해 처리
+    product_names=[]
     for userID in top_3_users:
         # fitness가 "good"이고 해당 사용자의 모든 productID를 찾음
         cursor.execute("SELECT productID FROM user WHERE userID = %s AND fitness = 'Good'", (userID,))
         results = cursor.fetchall()  # 모든 행을 가져옴
 
-        product_names = []  # 추천 제품의 이름을 저장할 리스트
+        #product_names = []  # 추천 제품의 이름을 저장할 리스트
+        
         for result in results:
             productID = result[0]  # 튜플의 첫 번째 요소가 productID
+            print(f"유저추천제품ID: {userID}의 {productID}")
             # productID를 사용하여 해당 제품의 productName과 categoryID를 가져옴
-            cursor.execute("SELECT productName, categoryID FROM product WHERE productID = %s", (productID,))
+            cursor.execute("SELECT translated_productName, categoryID FROM product WHERE productID = %s", (productID,))
             product_result = cursor.fetchone()
-            if product_result and product_result[1] == user_category:
+            #print(f"product_result[0]: {product_result[0]}")
+            #print(f"product_result[1]: {product_result[1]}")
+            #print(f"유저 카테고리: {user_category}")
+            #print(f"{type(int(user_category))} {type(product_result[1])}")
+            if (product_result and product_result[1] == int(user_category)):
+                #print(f"카테고리 일치하는 화장품 존재함")
                 productName = product_result[0]  # productName은 튜플의 첫 번째 요소
                 product_names.append(productName)  # productName을 리스트에 추가
+                print(f"유저추천제품NAME: {userID}의 {productName}")
+               # print(f"유저추천제품NAMELIST:{product_names}")
 
         # 최대 3개까지의 추천 제품 출력
-        if product_names:
-            print(f"UserID {userID}: Recommended products: {', '.join(product_names[:3])}")
-            return product_names[:3]
-        else:
-            print(f"UserID {userID}: No recommended product found for user_category {user_category}")
-            return None
+    if product_names:
+        #중복 제거 (애초에 더하기 안되게 하거나 빈도수 활용하는데 사용하기)
+        product_names=set(product_names)
+        product_names=list(product_names)
+        print(f"UserID {userID}: Recommended products: {', '.join(product_names[:])}")
+        return product_names[:]
+    else:
+        print(f"UserID {userID}: No recommended product found for user_category {user_category}")
+        #return None
 
 
 
@@ -157,18 +173,19 @@ def get_initial_data():
     cursor.execute("SELECT * FROM user")
     user = cursor.fetchall()
 
-  
+    cursor.execute("SELECT * FROM userIngredients")
+    userIngredients = cursor.fetchall()  
 
     # Database 닫기
     cursor.close()
     db.close()
 
-    return product, user
+    return product, user, userIngredients
 
 
 @application.route("/")
 def hello():
-    product, user = get_initial_data()
+    product, user, userIngredients = get_initial_data()
     return render_template("Home.html", product=product, user=user)
 
 @application.route("/submit_email", methods=['POST'])
@@ -185,7 +202,7 @@ def submit_email():
 
 @application.route("/Insert")
 def Insert():
-    product, user = get_initial_data()
+    product, user, userIngredients = get_initial_data()
     user_email = session.get('user_email', None)
     db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
     cursor = db.cursor()
@@ -208,8 +225,8 @@ def Insert():
 @application.route("/insert_product", methods=["POST"])
 def insert_product():
 
-    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    cursor = db.cursor()
+    #db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
+    #cursor = db.cursor()
 
     # 클라이언트로부터 데이터 받기
     user_email = session.get('user_email', None)
@@ -390,7 +407,7 @@ def Recommend():
                 if most_similar_userID:
                     return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=most_similar_userID,user_email=user_email)
                 else:
-                    return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=None,user_email=user_email)
+                    return render_template('Recommend.html', current_page='Recommend.html', user_email=user_email)
                 
             else:
                 return "User ingredients not found."
