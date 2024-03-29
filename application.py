@@ -5,6 +5,7 @@ import pymysql
 import mysql.connector
 from database import DBhandler
 import re
+from collections import Counter
 
 
 
@@ -102,8 +103,8 @@ def find_most_similar_user(user_input):
     # 유사도에 따라 내림차순 정렬
     user_similarities.sort(key=lambda x: x[1], reverse=True)
 
-    # 상위 3명의 userID 추출
-    top_3_users = [userID for userID, sim in user_similarities[1:4] if sim > 0.6]
+    # 상위 3명의 userID 추출(자신은 유사도1이니까 그다음부터)
+    top_3_users = [userID for userID, sim in user_similarities[1:4] if sim > 0.3]
 
     #top_3_users = top_3_users[1:]
 
@@ -120,6 +121,8 @@ def find_most_similar_user(user_input):
 
 
 def find_users_recommend_products(top_3_users, cursor, user_category):
+    cursor.execute("SELECT productID FROM user WHERE userID = %s", (user_id_result,))
+    mycosmetics = cursor.fetchall()  # 요청한 유저의 productID를 가져옴 (이미 존재하는 화장품은 추천에서 제외하기위해)
     # 각 사용자에 대해 처리
     product_names=[]
     for userID in top_3_users:
@@ -130,29 +133,34 @@ def find_users_recommend_products(top_3_users, cursor, user_category):
         #product_names = []  # 추천 제품의 이름을 저장할 리스트
         
         for result in results:
-            productID = result[0]  # 튜플의 첫 번째 요소가 productID
-            print(f"유저추천제품ID: {userID}의 {productID}")
-            # productID를 사용하여 해당 제품의 productName과 categoryID를 가져옴
-            cursor.execute("SELECT translated_productName, categoryID FROM product WHERE productID = %s", (productID,))
-            product_result = cursor.fetchone()
-            #print(f"product_result[0]: {product_result[0]}")
-            #print(f"product_result[1]: {product_result[1]}")
-            #print(f"유저 카테고리: {user_category}")
-            #print(f"{type(int(user_category))} {type(product_result[1])}")
-            if (product_result and product_result[1] == int(user_category)):
-                #print(f"카테고리 일치하는 화장품 존재함")
-                productName = product_result[0]  # productName은 튜플의 첫 번째 요소
-                product_names.append(productName)  # productName을 리스트에 추가
-                print(f"유저추천제품NAME: {userID}의 {productName}")
-               # print(f"유저추천제품NAMELIST:{product_names}")
+            if result not in mycosmetics: #추천유저의 pdID가 사용자의 pdID랑 겹치지 않을때
+                productID = result[0]  # 튜플의 첫 번째 요소가 productID
+                #print(f"유저추천제품ID: {userID}의 {productID}")
+                # productID를 사용하여 해당 제품의 productName과 categoryID를 가져옴
+                cursor.execute("SELECT translated_productName, categoryID FROM product WHERE productID = %s", (productID,))
+                product_result = cursor.fetchone()
+                #print(f"product_result[0]: {product_result[0]}")
+                #print(f"product_result[1]: {product_result[1]}")
+                #print(f"유저 카테고리: {user_category}")
+                #print(f"{type(int(user_category))} {type(product_result[1])}")
+                if (product_result and product_result[1] == int(user_category)):
+                    #print(f"카테고리 일치하는 화장품 존재함")
+                    productName = product_result[0]  # productName은 튜플의 첫 번째 요소
+                    product_names.append(productName)  # productName을 리스트에 추가
+                    print(f"유저추천제품NAME: {userID}의 {productName}")
+                # print(f"유저추천제품NAMELIST:{product_names}")
 
         # 최대 3개까지의 추천 제품 출력
     if product_names:
         #중복 제거 (애초에 더하기 안되게 하거나 빈도수 활용하는데 사용하기)
-        product_names=set(product_names)
-        product_names=list(product_names)
+        #product_names=set(product_names)
+        #product_names=list(product_names)
+        count_product_items = Counter(product_names)
+        print(f"빈도수순 정렬 {count_product_items}")
+        Top_3_product_items=count_product_items.most_common(n=3)
+        Top_3_product_names = [item[0] for item in Top_3_product_items]
         print(f"UserID {userID}: Recommended products: {', '.join(product_names[:])}")
-        return product_names[:]
+        return Top_3_product_names[:]
     else:
         print(f"UserID {userID}: No recommended product found for user_category {user_category}")
         #return None
@@ -221,6 +229,49 @@ def Insert():
 
     return render_template("Insert_product.html",user_email=user_email, current_page='Insert_product.html',products=result, product=product, user=user)
 
+def update_user_ingredient():
+    email = session.get('user_email')  # 세션에서 이메일 주소 가져오기
+
+    if email:
+        db = DBhandler()
+
+        # 특정 이메일을 가진 사용자의 userID 검색
+        query = "SELECT userID FROM user WHERE email = %s"
+        user_id = db.execute_query(query, (email,))
+        
+        if user_id:
+            user_id = user_id[0][0]  # 튜플 형태로 반환되므로 첫 번째 요소만 사용
+            #print(f"{user_id}")
+            # 해당 사용자가 구매한 productID를 사용하여 productIngredients 검색
+            query = "SELECT productIngredients FROM product WHERE productID IN (SELECT productID FROM user WHERE email = %s)"
+            product_ingredients = db.execute_query(query, (email,))
+            ingredients_list=[]
+            # productIngredients를 하나의 리스트로 합치기
+            ingredients_list = ', '.join([row[0] for row in product_ingredients]) if product_ingredients else ''
+            # 위에서 얻은 ingredientsList를 userIngredient 테이블에 저장
+            # 이미 동일한 userID가 존재하는지 확인하는 쿼리
+            query = "SELECT COUNT(*) FROM userIngredients WHERE userID = %s"
+            count = db.execute_query(query, (user_id,))[0][0]
+
+            if count > 0:
+                # 이미 동일한 userID가 존재하면 업데이트
+                query = "UPDATE userIngredients SET ingredientsList = %s WHERE userID = %s"
+                db.execute_query(query, (ingredients_list, user_id))
+            else:
+                # 존재하지 않으면 새로운 행 삽입
+                query = "INSERT INTO userIngredients (userID, ingredientsList) VALUES (%s, %s)"
+                db.execute_query(query, (user_id, ingredients_list))
+            db.commit()
+            db.close_connection()
+
+            return "User ingredient updated successfully."
+        else:
+            db.close_connection()
+            return "User not found."
+    else:
+        return "No email found in session."
+
+
 
 @application.route("/insert_product", methods=["POST"])
 def insert_product():
@@ -230,6 +281,7 @@ def insert_product():
 
     # 클라이언트로부터 데이터 받기
     user_email = session.get('user_email', None)
+    email = session.get('user_email', None)
     product_name = request.form.get("product_name")
     fitness = request.form.get("fitness")
     print(f"제품명 확인 {product_name}")
@@ -271,13 +323,17 @@ def insert_product():
             insert_query = "INSERT INTO user (userID, email, productID, fitness) VALUES (%s, %s, %s, %s)"
             cursor.execute(insert_query, (user_id, user_email, product_id, fitness))
             db.commit()
+            update_user_ingredient()
+            db.commit()
 
             return redirect(url_for('Insert'))
         else:
             update_query = "UPDATE user SET fitness = %s WHERE userID = %s AND productID = %s"
             cursor.execute(update_query, (fitness, user_id, product_id))
+            
             db.commit()
-
+            update_user_ingredient()
+            db.commit()
             return redirect(url_for('Insert',current_page=request.path))
     else:
         return redirect(url_for('Insert'))
@@ -295,9 +351,11 @@ def delete_product(product_id):
     delete_query = "DELETE FROM user WHERE productID = %s"
     cursor.execute(delete_query, (product_id,))
 
+    
     # 변경 사항 커밋
     db.commit()
-
+    update_user_ingredient()
+    db.commit()
     # Database 닫기
     cursor.close()
     db.close()
@@ -311,59 +369,41 @@ def delete_product(product_id):
 
 @application.route('/Select_category')
 def Select_category():
-    return render_template('Select_category.html', current_page='Select_category.html')
 
+    user_email = session.get('user_email')
 
-def update_user_ingredient():
-    email = session.get('user_email')  # 세션에서 이메일 주소 가져오기
+    # 사용자의 데이터가 user 테이블에 있는지 확인
+    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
+    cursor = db.cursor()
 
-    if email:
-        db = DBhandler()
+    try:
+        query = "SELECT COUNT(*) FROM user WHERE email = %s"
+        cursor.execute(query, (user_email,))
+        user_exists = cursor.fetchone()[0]
 
-        # 특정 이메일을 가진 사용자의 userID 검색
-        query = "SELECT userID FROM user WHERE email = %s"
-        user_id = db.execute_query(query, (email,))
-        
-        if user_id:
-            user_id = user_id[0][0]  # 튜플 형태로 반환되므로 첫 번째 요소만 사용
-            #print(f"{user_id}")
-            # 해당 사용자가 구매한 productID를 사용하여 productIngredients 검색
-            query = "SELECT productIngredients FROM product WHERE productID IN (SELECT productID FROM user WHERE email = %s)"
-            product_ingredients = db.execute_query(query, (email,))
-
-            # productIngredients를 하나의 리스트로 합치기
-            ingredients_list = ', '.join([row[0] for row in product_ingredients])
-            # 위에서 얻은 ingredientsList를 userIngredient 테이블에 저장
-            # 이미 동일한 userID가 존재하는지 확인하는 쿼리
-            query = "SELECT COUNT(*) FROM userIngredients WHERE userID = %s"
-            count = db.execute_query(query, (user_id,))[0][0]
-
-            if count > 0:
-                # 이미 동일한 userID가 존재하면 업데이트
-                query = "UPDATE userIngredients SET ingredientsList = %s WHERE userID = %s"
-                db.execute_query(query, (ingredients_list, user_id))
-            else:
-                # 존재하지 않으면 새로운 행 삽입
-                query = "INSERT INTO userIngredients (userID, ingredientsList) VALUES (%s, %s)"
-                db.execute_query(query, (user_id, ingredients_list))
-            db.commit()
-            db.close_connection()
-
-            return "User ingredient updated successfully."
+        if user_exists:
+            # 사용자의 데이터가 user 테이블에 있으면 Select_category 페이지로 이동
+            return render_template("Select_category.html",current_page='Select_category.html')
         else:
-            db.close_connection()
-            return "User not found."
-    else:
-        return "No email found in session."
-
+            flash('제품을 한 개 이상 입력해주세요.')
+            return redirect(url_for('Insert'))
+    except Exception as e:
+        # 에러 처리
+        print(f"An error occurred: {str(e)}")
+    finally:
+        # Database 닫기
+        cursor.close()
+        db.close()
+    
 
 @application.route('/Recommend')
 def Recommend():
     global user_category
+    global user_id_result
     category = request.args.get('category','')
     # user ingredient 리스트 만드는 함수 실행 
 
-    update_user_ingredient()
+    #update_user_ingredient()
     
     #useringredients 불러오기 (추후 따로 함수로 만들기)
     user_email = session.get('user_email', None)
@@ -415,10 +455,6 @@ def Recommend():
             return "User ID not found."
     else:
         return "User email not found in session."
-
-
-
-
 
 
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
