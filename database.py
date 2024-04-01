@@ -61,3 +61,5 @@ class DBhandler:
         self.cursor.close()
         self.connection.close()
 
+
+   
