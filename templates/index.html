@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1, maximum-scale=1" />
+        <title>skinTree</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='./style.css')}}" />
+    
+        <style>
+            
+        </style>
+    </head>
+
+    <div id=screen>
+        <body> 
+            <div id="mainview">
+                
+            </div>   
+            <section>
+                {% block section %}
+                {% endblock section %}
+            </section>
+        </body>
+        
+        <footer>
+            <nav>
+                <a href="/back?current_page={{ current_page }}">이전</a>
+                <a href="/">홈</a>
+                <a href="/next?current_page={{ current_page }}">다음</a>
+            </nav>
+        </footer>    
+    </div>
+</html>
+

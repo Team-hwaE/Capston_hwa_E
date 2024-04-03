@@ -1,0 +1,39 @@
+{% extends "index.html" %}
+{% block section %}
+
+<h2>
+    원하는 카테고리를 선택해주세요
+</h2><br>
+	<div class="big_Category">
+		<div id="cate_name">
+			🌿 스킨케어
+		</div>
+		<div id="category">
+			<ul>
+				<li><a href="/Recommend?category=1" id="cate_link">스킨/토너</a></li>
+				<li><a href="/Recommend?category=2" id="cate_link">에센스/앰플</a></li>
+				<li><a href="/Recommend?category=3" id="cate_link">크림</a></li>
+			</ul>
+		</div>
+	</div>
+    
+	<div class="big_Category">
+		<div id="cate_name">
+			<a href="/Recommend?category=4" id="cate_link">🌿 클렌징/필링</a>
+		</div>
+	</div>
+
+	<div class="big_Category">
+		<div id="cate_name">
+			<a href="/Recommend?category=5" id="cate_link">🌿 마스크팩</a>
+		</div>
+	</div>
+
+	<div class="big_Category" >
+		<div id="cate_name">
+			<a href="/Recommend?category=6" id="cate_link">🌿 선케어</a>
+		</div>
+	</div>
+
+	{{user_email}}
+    {% endblock section %}
