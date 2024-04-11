@@ -8,18 +8,10 @@ import re
 from collections import Counter
 
 
-
 application = Flask(__name__)
 application.secret_key = 'your_secret_key'
 
-#db = DBhandler()
-
-
-
-db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-cursor = db.cursor()
-
-
+Backend = DBhandler()
 
 
 def jaccard_similarity(set1, set2):
@@ -62,35 +54,20 @@ def calculate_jaccard_similarity(user_input, ingredients_list):
     # 자카드 유사도 계산
     return jaccard_similarity(combined_userInput, combined_ingList)
 
-def random_recommendation(user_category, user_input):
-    # 사용자의 카테고리와 일치하는 제품을 찾아야 함
-    cursor.execute("SELECT productID, productIngredients FROM product WHERE categoryID = %s", (user_category,))
-    products = cursor.fetchall()
 
-    highest_similarity = 0
-    most_similar_productID = None
-
-    # 각 제품의 유사도 계산 및 비교
-    for productID, productIngredients in products:
-        similarity = calculate_jaccard_similarity(user_input, productIngredients)
-        print("productID:", productID, "유사도:", similarity)  # 각 유사도 출력
-        if similarity > highest_similarity:
-            highest_similarity = similarity
-            most_similar_productID = productID
-
-    if highest_similarity > 0.6:
-        print("Most similar productID:", most_similar_productID)
-    else:
-        print("No products with similarity over 0.6. No recommendation.\n")
-
-
+# random_index 배열에서 각 productID에 대한 categoryID를 가져오는 함수
+def get_category_ids(filtered_index):
+    Backend=DBhandler()
+    Backend.cursor.execute("SELECT categoryID FROM product WHERE productID = %s", (filtered_index,))
+    category_id = Backend.cursor.fetchone()
+    return category_id[0] if category_id else None
 
 def find_most_similar_user(user_input):
+    Backend=DBhandler()
     user_similarities = []
-
     # useringredients 테이블에서 모든 행 가져오기
-    cursor.execute("SELECT userID, ingredientsList FROM userIngredients")
-    result = cursor.fetchall()
+    Backend.cursor.execute("SELECT userID, ingredientsList FROM userIngredients")
+    result = Backend.cursor.fetchall()
 
     # 각 행의 유사도 계산 및 비교
     for userID, ingredientsList in result:
@@ -104,31 +81,31 @@ def find_most_similar_user(user_input):
     user_similarities.sort(key=lambda x: x[1], reverse=True)
 
     # 상위 3명의 userID 추출(자신은 유사도1이니까 그다음부터)
-    top_3_users = [userID for userID, sim in user_similarities[1:4] if sim > 0.3]
+    top_3_users = [userID for userID, sim in user_similarities[1:4] if sim > 0.6]
 
     #top_3_users = top_3_users[1:]
 
     # 반환된 top_3_users에 따라 조건부로 find_users_recommend_products 함수 호출
     if top_3_users:
         print("Top3 most similar userIDs:", top_3_users)
-        product_names = find_users_recommend_products(top_3_users, cursor, user_category)
+        product_names = find_users_recommend_products(top_3_users, Backend.cursor, user_category)
+        #find_user_recommend_products에서 반환값이 없으면 None이 반환되고 결국 else 문과 똑같이 동작
         return product_names
-    else:
-        print("No users with similarity over 0.6. Recommending random product.\n")
-        random_recommendation(user_category, user_input)
+    else: 
         return None
 
 
 
 def find_users_recommend_products(top_3_users, cursor, user_category):
-    cursor.execute("SELECT productID FROM user WHERE userID = %s", (user_id_result,))
-    mycosmetics = cursor.fetchall()  # 요청한 유저의 productID를 가져옴 (이미 존재하는 화장품은 추천에서 제외하기위해)
+    Backend=DBhandler()
+    Backend.cursor.execute("SELECT productID FROM user WHERE userID = %s", (user_id_result,))
+    mycosmetics = Backend.cursor.fetchall()  # 요청한 유저의 productID를 가져옴 (이미 존재하는 화장품은 추천에서 제외하기위해)
     # 각 사용자에 대해 처리
     product_names=[]
     for userID in top_3_users:
         # fitness가 "good"이고 해당 사용자의 모든 productID를 찾음
-        cursor.execute("SELECT productID FROM user WHERE userID = %s AND fitness = 'Good'", (userID,))
-        results = cursor.fetchall()  # 모든 행을 가져옴
+        Backend.cursor.execute("SELECT productID FROM user WHERE userID = %s AND fitness = 'Good'", (userID,))
+        results = Backend.cursor.fetchall()  # 모든 행을 가져옴
 
         #product_names = []  # 추천 제품의 이름을 저장할 리스트
         
@@ -159,8 +136,8 @@ def find_users_recommend_products(top_3_users, cursor, user_category):
         print(f"빈도수순 정렬 {count_product_items}")
         Top_3_product_items=count_product_items.most_common(n=3)
         Top_3_product_names = [item[0] for item in Top_3_product_items]
-        print(f"UserID {userID}: Recommended products: {', '.join(product_names[:])}")
-        return Top_3_product_names[:]
+        print(f"UserID {user_id}: Recommended products: {', '.join(product_names[:])}")
+        return Top_3_product_names[:3]
     else:
         print(f"UserID {userID}: No recommended product found for user_category {user_category}")
         #return None
@@ -168,25 +145,20 @@ def find_users_recommend_products(top_3_users, cursor, user_category):
 
 
 def get_initial_data():
-    # 데이터베이스 연결
-    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    
-    # 데이터에 접근
-    cursor = db.cursor()
 
+    Backend=DBhandler()
     # SQL query 실행
-    cursor.execute("SELECT * FROM product")
-    product = cursor.fetchall()
+    Backend.cursor.execute("SELECT * FROM product")
+    product = Backend.cursor.fetchall()
 
-    cursor.execute("SELECT * FROM user")
-    user = cursor.fetchall()
+    Backend.cursor.execute("SELECT * FROM user")
+    user = Backend.cursor.fetchall()
 
-    cursor.execute("SELECT * FROM userIngredients")
-    userIngredients = cursor.fetchall()  
+    Backend.cursor.execute("SELECT * FROM userIngredients")
+    userIngredients = Backend.cursor.fetchall()  
 
     # Database 닫기
-    cursor.close()
-    db.close()
+    Backend.close_cursor()
 
     return product, user, userIngredients
 
@@ -195,6 +167,7 @@ def get_initial_data():
 def hello():
     product, user, userIngredients = get_initial_data()
     return render_template("Home.html", product=product, user=user)
+
 
 @application.route("/submit_email", methods=['POST'])
 def submit_email():
@@ -212,8 +185,7 @@ def submit_email():
 def Insert():
     product, user, userIngredients = get_initial_data()
     user_email = session.get('user_email', None)
-    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    cursor = db.cursor()
+    Backend = DBhandler()
 
     query = """
     SELECT user.productID, product.translated_productName, user.fitness, product.productID
@@ -222,10 +194,10 @@ def Insert():
     WHERE user.email = %s
     """
 
-    cursor.execute(query, (user_email,))
-    result = cursor.fetchall()
+    Backend.cursor.execute(query, (user_email,))
+    result = Backend.cursor.fetchall()
 
-    cursor.close()
+    Backend.close_cursor()
 
     return render_template("Insert_product.html",user_email=user_email, current_page='Insert_product.html',products=result, product=product, user=user)
 
@@ -262,11 +234,11 @@ def update_user_ingredient():
                 query = "INSERT INTO userIngredients (userID, ingredientsList) VALUES (%s, %s)"
                 db.execute_query(query, (user_id, ingredients_list))
             db.commit()
-            db.close_connection()
+            db.close_cursor()
 
             return "User ingredient updated successfully."
         else:
-            db.close_connection()
+            db.close_cursor()
             return "User not found."
     else:
         return "No email found in session."
@@ -275,10 +247,7 @@ def update_user_ingredient():
 
 @application.route("/insert_product", methods=["POST"])
 def insert_product():
-
-    #db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    #cursor = db.cursor()
-
+    Backend=DBhandler()
     # 클라이언트로부터 데이터 받기
     user_email = session.get('user_email', None)
     email = session.get('user_email', None)
@@ -289,16 +258,16 @@ def insert_product():
 
     # user 테이블에서 이메일로부터 userID 가져오기
     user_id_query = "SELECT userID FROM user WHERE email = %s"
-    cursor.execute(user_id_query, (user_email,))
-    user_id_result = cursor.fetchone()
+    Backend.cursor.execute(user_id_query, (user_email,))
+    user_id_result = Backend.cursor.fetchone()
 
     if user_id_result:
         user_id = user_id_result[0]
     else:
         # 새로운 사용자이므로 새로운 userID 생성
         max_user_id_query = "SELECT MAX(userID) FROM user"
-        cursor.execute(max_user_id_query)
-        max_user_id_result = cursor.fetchone()
+        Backend.cursor.execute(max_user_id_query)
+        max_user_id_result = Backend.cursor.fetchone()
         if max_user_id_result[0]:
             user_id = max_user_id_result[0] + 1
         else:
@@ -306,8 +275,8 @@ def insert_product():
         
     # product 테이블에서 productName으로부터 productID 가져오기
     product_id_query = "SELECT productID FROM product WHERE translated_productName = %s"
-    cursor.execute(product_id_query, (product_name,))
-    product_id_result = cursor.fetchone()
+    Backend.cursor.execute(product_id_query, (product_name,))
+    product_id_result = Backend.cursor.fetchone()
     print(f"제품명 아이디 확인 {product_id_result}")
     if product_id_result:
         product_id = product_id_result[0]
@@ -315,95 +284,81 @@ def insert_product():
         print(f"제품명 아이디 확인2 {product_id_result[0]}")     
         # 중복 여부 확인
         check_query = "SELECT COUNT(*) FROM user WHERE userID = %s AND productID = %s"
-        cursor.execute(check_query, (user_id, product_id))
-        count_result = cursor.fetchone()
+        Backend.cursor.execute(check_query, (user_id, product_id))
+        count_result = Backend.cursor.fetchone()
 
         if count_result[0] == 0:
             # user table에 데이터 입력하기
             insert_query = "INSERT INTO user (userID, email, productID, fitness) VALUES (%s, %s, %s, %s)"
-            cursor.execute(insert_query, (user_id, user_email, product_id, fitness))
-            db.commit()
+            Backend.cursor.execute(insert_query, (user_id, user_email, product_id, fitness))
+            Backend.commit()
             update_user_ingredient()
-            db.commit()
+            Backend.commit()
 
-            return redirect(url_for('Insert'))
+            return redirect(url_for('Insert',current_page=request.path))
         else:
             update_query = "UPDATE user SET fitness = %s WHERE userID = %s AND productID = %s"
-            cursor.execute(update_query, (fitness, user_id, product_id))
+            Backend.cursor.execute(update_query, (fitness, user_id, product_id))
             
-            db.commit()
+            Backend.commit()
             update_user_ingredient()
-            db.commit()
+            Backend.commit()
             return redirect(url_for('Insert',current_page=request.path))
     else:
-        return redirect(url_for('Insert'))
-    
-    
+        return redirect(url_for('Insert'))   
     
 
 @application.route("/delete_product/<int:product_id>")
 def delete_product(product_id):
-    # 데이터베이스 연결
-    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    cursor = db.cursor()
-
+    Backend=DBhandler()
     # DELETE 쿼리 실행
     delete_query = "DELETE FROM user WHERE productID = %s"
-    cursor.execute(delete_query, (product_id,))
+    Backend.cursor.execute(delete_query, (product_id,))
 
-    
     # 변경 사항 커밋
-    db.commit()
+    Backend.commit()
     update_user_ingredient()
-    db.commit()
+    Backend.commit()
     # Database 닫기
-    cursor.close()
-    db.close()
-
+    Backend.close_cursor()
 
     # 다시 Insert 페이지로 리다이렉트 또는 필요한 페이지로 리다이렉트
     return redirect(url_for('Insert'))
 
 
-
-
 @application.route('/Select_category')
 def Select_category():
-
     user_email = session.get('user_email')
-
+    Backend=DBhandler()
     # 사용자의 데이터가 user 테이블에 있는지 확인
-    db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-    cursor = db.cursor()
-
     try:
         query = "SELECT COUNT(*) FROM user WHERE email = %s"
-        cursor.execute(query, (user_email,))
-        user_exists = cursor.fetchone()[0]
-
+        Backend.cursor.execute(query, (user_email,))
+        user_exists = Backend.cursor.fetchone()[0]
+        Backend.close_cursor()
         if user_exists:
             # 사용자의 데이터가 user 테이블에 있으면 Select_category 페이지로 이동
             return render_template("Select_category.html",current_page='Select_category.html')
         else:
+            Backend.close_cursor()
             flash('제품을 한 개 이상 입력해주세요.')
             return redirect(url_for('Insert'))
     except Exception as e:
         # 에러 처리
         print(f"An error occurred: {str(e)}")
+        
     finally:
         # Database 닫기
-        cursor.close()
-        db.close()
+        Backend.close_cursor()
     
 
 @application.route('/Recommend')
 def Recommend():
     global user_category
     global user_id_result
+    global user_id
     category = request.args.get('category','')
     # user ingredient 리스트 만드는 함수 실행 
-
-    #update_user_ingredient()
     
     #useringredients 불러오기 (추후 따로 함수로 만들기)
     user_email = session.get('user_email', None)
@@ -411,21 +366,19 @@ def Recommend():
     user_category=category
     
     if user_email:
-        db = pymysql.connect(host='127.0.0.1', user='root', password='0322', db='skintreedb', charset='utf8')
-        cursor = db.cursor()
-
+        Backend=DBhandler()
         # 이메일을 사용하여 userID 검색
         user_id_query = "SELECT userID FROM user WHERE email = %s"
-        cursor.execute(user_id_query, (email,))
-        user_id_result = cursor.fetchone()
+        Backend.cursor.execute(user_id_query, (email,))
+        user_id_result = Backend.cursor.fetchone()
 
         if user_id_result:
             user_id = user_id_result[0]
 
             # userID를 사용하여 userIngredients의 ingredientsList 검색
             ingredients_query = "SELECT ingredientsList FROM userIngredients WHERE userID = %s"
-            cursor.execute(ingredients_query, (user_id,))
-            ingredients_result = cursor.fetchone()
+            Backend.cursor.execute(ingredients_query, (user_id,))
+            ingredients_result = Backend.cursor.fetchone()
 
             if ingredients_result:
                 ingredients_list = ingredients_result[0]
@@ -433,13 +386,13 @@ def Recommend():
                 #ingredients_list = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in ingredients_list]
               
                 user_input = ingredients_list
-                print(f"유저인풋타입{type(user_input)}")
+                #print(f"유저인풋타입{type(user_input)}")
                 #예전 버전
                 #user_input = [ingredient.strip("[]").replace("'", "").split(", ") for ingredient in user_input]
                 #user_input = '[' + user_input + ']'
                 #print(f"유저인풋타입2{type(user_input)}")
                 #user_input 타입은 str 임
-                print(f"유저아이디{user_id}")
+                print(f"유저아이디 {user_id}")
                 print(f"선택한 카테고리: {category}")
                 #print(f"최종입력버전{user_input}")
                 most_similar_userID = find_most_similar_user(user_input)
@@ -447,7 +400,27 @@ def Recommend():
                 if most_similar_userID:
                     return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=most_similar_userID,user_email=user_email)
                 else:
-                    return render_template('Recommend.html', current_page='Recommend.html', user_email=user_email)
+                    print("No users with similarity over 0.6. Recommending random product.\n")
+                    #random_index=random_recommendation(user_category, user_input,X, X_pca, clust_model)
+                    random_index=[]
+                    random_index=itsrandom(user_input)
+                    print(f"랜덤인덱스 : {random_index}")
+                    filtered_random_index=[]
+                    for filtered_index in random_index:
+                        
+                        random_category=get_category_ids(filtered_index)
+                        #print(f"random cate {type(random_category)} user cate {type(user_category)}")
+                        if random_category is not None and int(random_category) == int(user_category):
+                            filtered_random_index.append(filtered_index)
+                    print(f"필터인덱스 : {filtered_random_index}")
+                    filtered_pdname=[]
+                    for pdname in filtered_random_index:
+                        Backend.cursor.execute("SELECT translated_productName FROM product WHERE productID = %s", (pdname,))
+                        result = Backend.cursor.fetchone()
+                        if result:
+                            filtered_pdname.append(result[0])
+
+                    return render_template('Recommend2.html', current_page='Recommend2.html', user_email=user_email,most_similar_userID=filtered_pdname[:3])
                 
             else:
                 return "User ingredients not found."
@@ -455,7 +428,6 @@ def Recommend():
             return "User ID not found."
     else:
         return "User email not found in session."
-
 
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
 
@@ -480,6 +452,8 @@ def back():
         return redirect(url_for('Insert'))
     elif current_page == 'Recommend.html':
         return redirect(url_for('Select_category'))
+    elif current_page == 'Recommend2.html':
+        return redirect(url_for('Select_category'))
     elif current_page == 'Restart.html':
         return redirect(url_for('Recommend'))
     else:
@@ -496,8 +470,111 @@ def next():
         return redirect(url_for('Select_category'))
     elif current_page == 'Recommend.html':
         return redirect(url_for('Restart'))
+    elif current_page == 'Recommend2.html':
+        return redirect(url_for('Restart'))
     else:
         return redirect(url_for('hello'))
+
+
+
+"""k군집"""
+import numpy as np
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.decomposition import TruncatedSVD
+import pickle
+from sklearn.metrics.pairwise import euclidean_distances
+from sklearn.cluster import KMeans
+
+
+import matplotlib
+matplotlib.use('Agg')  # 백엔드 설정
+import matplotlib.pyplot as plt
+
+def itsrandom(user_input):
+    # 데이터 불러오기
+    data = pd.read_csv("/Users/jeongdahee/Desktop/Capston_hwa_E-1.0/new_X_data_fin.csv")
+    #data = pd.read_csv("/home/ubuntu/Capston_hwa_E-1.0 3/X_data_fin.csv") AWS 경로
+    X = data
+
+    # 새 데이터
+    new_data = user_input
+
+    # 모델을 파일에서 불러오기
+    with open('kms_model.pkl', 'rb') as f:
+        loaded_model = pickle.load(f)
+        
+    # Initialize CountVectorizer
+    vectorizer = CountVectorizer()
+    fit_X = vectorizer.fit_transform(X)
+
+    # 새 데이터를 하나의 문자열 표현으로 변환
+    new_corpus = ' '.join([ingredient.replace("-", "and") for ingredient in new_data])
+
+    # CountVectorizer를 사용하여 새 데이터를 벡터화
+    new_vectorized = vectorizer.transform([new_corpus])
+
+    data_columns = X.shape[1]
+    print("data:",data_columns)
+    new_columns = new_vectorized.shape[1]
+    print("new:",new_columns)
+
+    if new_columns < data_columns:
+        # 새로운 데이터의 열이 더 적은 경우, 빈 셀을 0으로 채우기
+        extra_columns = np.zeros(data_columns - new_columns)
+        new_vectorized = np.hstack((new_vectorized.toarray(), extra_columns.reshape(1, -1)))
+    elif new_columns > data_columns:
+        # 새로운 데이터의 열이 더 많은 경우, 기존 데이터의 열의 개수와 동일하게 자르기
+        new_vectorized = new_vectorized[:, :data_columns]
+
+        
+    data_columns = X.shape[1]
+    print("data:",data_columns)
+    new_fit_columns = new_vectorized.shape[1]
+    print("new:",new_fit_columns)
+
+    X_array = X.values
+    combined_data = np.vstack((X_array, new_vectorized))
+
+    
+    # TruncatedSVD를 사용하여 2차원으로 차원 축소
+    svd = TruncatedSVD(n_components=2)
+    new_svd = svd.fit_transform(combined_data)
+
+    # 새로운 벡터화된 데이터에 대한 군집 레이블을 예측
+    predicted_cluster = loaded_model.predict(new_svd)
+
+    # 새로운 데이터의 인덱스
+    new_data_index = combined_data.shape[0] - 1
+
+    pred_new_cluster = predicted_cluster[new_data_index]
+
+    # 예측된 군집 레이블을 출력
+    print("예측된 군집 레이블:", pred_new_cluster)
+
+    # 각 데이터포인트가 속한 군집의 레이블
+    new_model_label = loaded_model.predict(new_svd)
+
+    new_data_point = combined_data[new_data_index]
+
+    # 해당 클러스터에 속한 데이터포인트 인덱스 가져오기
+    cluster_indices = np.where(loaded_model.labels_ == pred_new_cluster)
+
+    # 클러스터 내의 데이터포인트들을 2차원 배열로 변환
+    cluster_points = combined_data[cluster_indices]
+
+    # 클러스터 내의 데이터포인트와 새로운 데이터 사이의 유클리드 거리 계산
+    distances = euclidean_distances(new_data_point.reshape(1, -1), cluster_points)
+
+    # 거리를 기준으로 가장 가까운 데이터포인트 10개의 인덱스를 찾기
+    closest_indices = cluster_indices[0][np.argsort(distances.flatten())[:10]]
+
+    print("가장 가까운 데이터포인트 10개의 인덱스:", closest_indices)
+    return closest_indices
 
 
 if __name__ == "__main__":

@@ -29,13 +29,15 @@
 
 body {
 	font-family: 'LotteMartDream';
-  background-color:#F0F0EB;;
+  background-color:#F0F0EB;
+  
 }
 
 
 #screen {
-    align-content:center;
+    /*align-content:center;
     align-items:center;
+    display:flex;*/
     max-width:393px;
     max-height:852px;
     min-width:320px;
@@ -43,6 +45,8 @@ body {
     margin-right:auto;
     overflow: hidden;
     touch-action: none;
+    margin: auto;
+    
 }
 
 
@@ -50,6 +54,7 @@ body {
     height: auto;
     min-height: 100%;
     margin-bottom: 40%;
+    /*text-align: center; 화면가운데로 안가면 주석풀기*/
 }
 /*
 footer{
@@ -137,7 +142,7 @@ input.bigbutton {
   padding-right: 10px;
 }
 /* Insert_product 제품입력페이지 CSS */
-h2,h4 {
+h1,h2,h4,h5 {
     text-align:center;
     font-family: LotteMartDream;
     color: #424242;
