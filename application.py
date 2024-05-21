@@ -81,6 +81,7 @@ def find_most_similar_user(user_input):
     user_similarities.sort(key=lambda x: x[1], reverse=True)
 
     # 상위 3명의 userID 추출(자신은 유사도1이니까 그다음부터)
+    global top_3_users
     top_3_users = [userID for userID, sim in user_similarities[1:4] if sim > 0.6]
 
     #top_3_users = top_3_users[1:]
@@ -357,7 +358,7 @@ def Recommend():
     global user_category
     global user_id_result
     global user_id
-    category = request.args.get('category','')
+    category = request.args.get('category','').strip()
     # user ingredient 리스트 만드는 함수 실행 
     
     #useringredients 불러오기 (추후 따로 함수로 만들기)
@@ -398,7 +399,10 @@ def Recommend():
                 most_similar_userID = find_most_similar_user(user_input)
                 #find_users_recommend_products(most_similar_userID, cursor)
                 if most_similar_userID:
-                    return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=most_similar_userID,user_email=user_email)
+                    session['most_similar_userID'] = most_similar_userID
+                    session['top_3_users'] = top_3_users
+                    session['user_category'] = user_category
+                    return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=most_similar_userID,user_email=user_email, top_3_users=top_3_users, user_category=user_category)
                 else:
                     print("No users with similarity over 0.6. Recommending random product.\n")
                     #random_index=random_recommendation(user_category, user_input,X, X_pca, clust_model)
@@ -420,7 +424,7 @@ def Recommend():
                         if result:
                             filtered_pdname.append(result[0])
 
-                    return render_template('Recommend2.html', current_page='Recommend2.html', user_email=user_email,most_similar_userID=filtered_pdname[:3])
+                    return render_template('Recommend2.html', current_page='Recommend2.html', user_email=user_email,most_similar_userID=filtered_pdname[:3],user_category=user_category)
                 
             else:
                 return "User ingredients not found."
@@ -431,15 +435,49 @@ def Recommend():
 
     # 머신러닝 함수 실행하기 (database나 백엔드단에서 작성)
 
-    # category 변수에 저장되어있음 이 아래 실행안되는 부분임
-    print(f"선택한 카테고리 {category}")
-    return render_template('Recommend.html', current_page='Recommend.html')
-
 
 
 @application.route('/Restart')
 def Restart():
     return render_template('Restart.html', current_page='Restart.html')
+
+
+@application.route('/Select_friend')
+def Select_friend():
+    return render_template('Select_friend.html', current_page='Select_friend.html',top_3_users=top_3_users)
+
+
+@application.route('/BackToRecommend')
+def BackToRecommend():
+    most_similar_userID = session.get('most_similar_userID')
+    top_3_users = session.get('top_3_users')
+    user_category = session.get('user_category')
+    user_email = session.get('user_email')
+    if most_similar_userID and top_3_users and user_category and user_email:
+        return render_template('Recommend.html', current_page='Recommend.html', most_similar_userID=most_similar_userID, user_email=user_email, top_3_users=top_3_users, user_category=user_category)
+    else:
+        return "No data available."
+
+@application.route('/View_friend/<int:userID>')
+def View_friend(userID):
+    userID=int(userID)
+    print(f'{type(userID)}')
+    product, user, userIngredients = get_initial_data()
+    Backend = DBhandler()
+
+    query = """
+    SELECT user.productID, product.translated_productName, user.fitness, product.productID
+    FROM user
+    JOIN product ON user.productID = product.productID
+    WHERE user.userID = %s
+    """
+
+    Backend.cursor.execute(query, (userID,))
+    result = Backend.cursor.fetchall()
+
+    Backend.close_cursor()
+
+    return render_template('View_friend.html', current_page='View_friend.html',products=result,userID=userID)
 
 
 @application.route("/back")
@@ -456,6 +494,10 @@ def back():
         return redirect(url_for('Select_category'))
     elif current_page == 'Restart.html':
         return redirect(url_for('Recommend'))
+    elif current_page == 'Select_friend.html':
+        return redirect(url_for('BackToRecommend'))
+    elif current_page == 'View_friend.html':
+        return redirect(url_for('Select_friend'))
     else:
         return redirect(url_for('hello'))
     
@@ -472,6 +514,10 @@ def next():
         return redirect(url_for('Restart'))
     elif current_page == 'Recommend2.html':
         return redirect(url_for('Restart'))
+    elif current_page == 'Select_friend.html':
+        return redirect(url_for('View_friend'))
+    elif current_page == 'View_friend.html':
+        return redirect(url_for('hello'))
     else:
         return redirect(url_for('hello'))
 

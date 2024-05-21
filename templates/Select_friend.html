@@ -1,0 +1,44 @@
+{% extends "index.html" %}
+{% block section %}
+
+<div class="title">
+  성분프렌즈 살펴보기
+</div>
+<div class="friend_container">
+
+  <div class="friend_block">
+      <div class="friend_image">
+        <img src="static/image/frenh03.png">
+      </div>
+      <div class="friend_text">
+          <p>프렌치 불독</p><br>
+          <button class="friend_button" onclick="location.href='/View_friend/'+ parseInt('{{ top_3_users[0] }}');">입력 화장품 보러가기</button>
+      </div>
+  </div>
+ 
+
+
+  <div class="friend_block">
+      <div class="friend_image">
+          <img src="static/image/bichon03.png">
+      </div>
+      <div class="friend_text">
+          <p>비숑</p><br>
+          <button class="friend_button" onclick="location.href='/View_friend/'+ parseInt('{{ top_3_users[1] }}');">입력 화장품 보러가기</button>
+      </div>
+  </div>
+  
+  <div class="friend_block">
+      <div class="friend_image">
+        <img src="static/image/welsh02.png">
+      </div>
+      <div class="friend_text">
+          <p>웰시 코기</p><br>
+          <button class="friend_button" onclick="location.href='/View_friend/'+ parseInt('{{ top_3_users[2] }}');">입력 화장품 보러가기</button>
+      </div>
+  </div>
+
+</div>
+
+
+{% endblock section %}
