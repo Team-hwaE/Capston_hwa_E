@@ -515,7 +515,7 @@ def next():
     elif current_page == 'Recommend2.html':
         return redirect(url_for('Restart'))
     elif current_page == 'Select_friend.html':
-        return redirect(url_for('View_friend'))
+        return redirect(url_for('Select_friend'))
     elif current_page == 'View_friend.html':
         return redirect(url_for('hello'))
     else:
