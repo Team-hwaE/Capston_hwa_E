@@ -1,0 +1,39 @@
+{% extends "index.html" %}
+{% block section %}
+
+<div class="title">
+  당신의 성분프렌즈는 <br>
+  아래 화장품을 입력했어요
+</div>
+
+<div class="friend_list">
+  <table>
+    <thead>
+      <tr align="center">
+        <th colspan="3">입력 리스트</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for i in products %}
+      <tr>
+        <td>
+          <div class="rating_icon">
+            {% if i[2] == 'Good' %}
+            <span class="good">🌼</span>
+            {% elif i[2] == 'Bad' %}
+            <span class="bad">🌼</span>
+            {% else %}
+            <span class="neutral">🌼</span>
+            {% endif %}
+          </div>
+          <div class="fpd_name">
+            {{ i[1] }}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock section %}

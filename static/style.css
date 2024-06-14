@@ -29,13 +29,15 @@
 
 body {
 	font-family: 'LotteMartDream';
-  background-color:#F0F0EB;;
+  background-color:#F0F0EB;
+  
 }
 
 
 #screen {
-    align-content:center;
+    /*align-content:center;
     align-items:center;
+    display:flex;*/
     max-width:393px;
     max-height:852px;
     min-width:320px;
@@ -43,6 +45,8 @@ body {
     margin-right:auto;
     overflow: hidden;
     touch-action: none;
+    margin: auto;
+    
 }
 
 
@@ -50,6 +54,7 @@ body {
     height: auto;
     min-height: 100%;
     margin-bottom: 40%;
+    /*text-align: center; 화면가운데로 안가면 주석풀기*/
 }
 /*
 footer{
@@ -137,7 +142,7 @@ input.bigbutton {
   padding-right: 10px;
 }
 /* Insert_product 제품입력페이지 CSS */
-h2,h4 {
+h1,h2,h4,h5 {
     text-align:center;
     font-family: LotteMartDream;
     color: #424242;
@@ -462,29 +467,181 @@ h2,h4 {
   padding-bottom: 6px;
   padding-left: 20px;
   border-bottom: 2px solid rgba(162, 170, 123, .5); 
+  
 }
 
 .recommend_list ol li:last-child {
   border-bottom: none;
 }
 
-/*
+/* 친구 선택 화면 */
+.friend_container {
+  width: 90%;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* 친구 블록 사이의 간격 */
+}
 
-.recommend_list ol{
-  display:inline-block;
+.friend_block {
+  width: 100%;
+  max-width: 500px; /* 최대 너비 설정 */
+  height: 135px; /* 고정 높이 설정 */
+  border-radius: 20px; /* 전체를 둥글게 */
+  background-color: rgba(255, 255, 255, 0.8); /* 배경색을 흰색으로 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+  display: flex; /* Flexbox 레이아웃 사용 */
+  align-items: center; /* 세로 중앙 정렬 */
+  padding: 15px; /* 안쪽 여백 */
+  transition: transform 0.3s ease; /* 호버 애니메이션 */
+}
+
+.friend_block:hover {
+  transform: translateY(-5px); /* 호버 시 위로 이동 */
+}
+
+.friend_image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* 원형 이미지 */
+  background-color: #ccc; /* 임시 배경색 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: #fff;
+  margin-right: 20px; /* 오른쪽 마진 */
+}
+
+.friend_image p {
+  margin: 0; /* 내부 p 요소의 마진 제거 */
+}
+
+.friend_image img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%; /* 원형 이미지 */
+  object-fit: cover; /* 이미지가 잘리는 경우 잘 맞게 조정 */
+}
+
+.friend_text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.friend_text p {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.friend_button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 14px;
+  background-color: #f26d6d; /* 버튼 배경색 */
+  color: white; /* 버튼 텍스트 색상 */
+  border: none; /* 테두리 제거 */
+  border-radius: 20px; /* 둥근 모서리 */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease; /* 호버 애니메이션 */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+}
+
+.friend_button:hover {
+  background-color: #d55b5b; /* 호버 시 배경색 */
+  transform: translateY(-3px); /* 호버 시 약간 위로 이동 */
+}
+
+
+/* View friend */
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+  font-family: LotteMartDream;
+  color: #424242;
+}
+
+.friend_list {
+  width: 90%;
+  margin: auto;
+  max-width: 500px;
+  background-color: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+  padding: 15px;
+  overflow: hidden; /* Max-height 스크롤을 위해 hidden으로 설정 */
+}
+
+.friend_list table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.friend_list thead {
+  display: table;
+  width: 100%;
+  margin-bottom: 6px;
+}
+
+.friend_list tbody {
+  display: block;
+  max-height: 250px;
+  overflow-y: auto; /* 세로 스크롤 추가 */
+  width: 100%;
+}
+
+.friend_list th {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 15px 0;
+  background-color: #f2f2f2;
+  border-bottom: 2px solid #ddd;
+}
+
+.friend_list tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed; /* 고정된 테이블 레이아웃 */
+}
+
+.friend_list td {
+  padding: 15px 0;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+}
+
+.rating_icon {
+  flex-shrink: 0; /* 크기를 줄이지 않음 */
+  margin-right: 10px;
+  font-size: 20px; /* 아이콘 크기 조정 */
+}
+
+.rating_icon .good {
+  color: #65A5EA;
+}
+
+.rating_icon .bad {
+  color: #EB85AF;
+}
+
+.rating_icon .neutral {
+  color: black;
+}
+
+.fpd_name {
+  flex-grow: 1; /* 남은 공간을 차지 */
+  word-wrap: break-word;
   word-break: keep-all;
-  font-size: 20px;
-  line-height: 2;
-}
-
-
-.recommend_list ol li {
+  white-space: normal; /* 텍스트를 여러 줄로 표시 */
+  font-size: 18px; /* 폰트 크기 */
+  line-height: 1.5; /* 줄 간격 */
+  margin: 0; /* 기본 여백 제거 */
   
-  border-bottom: 3px solid #ddd;
-  padding:none;
 }
-
-ol li:last-child {
-  border-bottom: none
-}
-*/
