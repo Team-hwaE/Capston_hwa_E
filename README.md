@@ -5,23 +5,24 @@
 
 > **이화여자대학교 컴퓨터공학전공 캡스톤디자인프로젝트 : 2023-9 ~ 2024-5**
 <br>
-스킨트리는 기존에 잘 맞았던 화장품을 입력하면 자동으로 성분리스트를 생성하고, 당신의 성분프렌즈를 찾아 화장품을 추천해주는 서비스입니다.
+스킨트리는 기존에 잘 맞았던 화장품을 입력하면 자동으로 개인 성분리스트를 생성하고, 당신의 성분프렌즈를 찾아 화장품을 추천해주는 서비스입니다.
 <br>
 
 ## 🔧 팀원 소개
 
 |      정다희       |          안민영         |       임수화         |                                                                                                               
 | :------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | 
-|   <img width="160px" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/fc8c4c59-d033-4c38-ad18-7e2d6daeb9e9" />    |                      <img width="160px" src="https://user-images.githubusercontent.com/50205887/207570536-f5a82e48-99a1-4399-91d3-75fc5f8f3349.png" />    |                   <img width="160px" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/89aa9120-c3fe-490c-a1e1-4df72578488e"	/>   |
+|   <img width="160px" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/fc8c4c59-d033-4c38-ad18-7e2d6daeb9e9" />    |                      <img width="160px" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/0d7710c7-abfd-4fba-b383-8a2579a777a0" />    |                   <img width="160px" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/89aa9120-c3fe-490c-a1e1-4df72578488e"	/>   |
 |   [@da2mon](https://github.com/da2mon)   |    [@minzer01](https://github.com/minzer01)  | [@aihamster](https://github.com/aihamster)  |
-| 이화여자대학교 컴퓨터공학과 4학년 | 이화여자대학교 컴퓨터공학과 4학년 | 이화여자대학교 컴퓨터공학과 4학년 |
+| 프론트엔드 | 백엔드 | 머신러닝 |
 
 
 
 ## 배포 주소
 
-> **개발 버전** : [http://voluntain.cs.skku.edu/](http://voluntain.cs.skku.edu/) <br>
-
+> **웹 페이지 주소 ** : [http:~~~](http://~~/) <br>
+* 테스트 계정 : demo@gmail.com 
+> **로컬 주소** : [http://127.0.0.1:3000/]
 
 ## 프로젝트 소개
 
@@ -30,33 +31,26 @@
 2. 에디터 (제품 성분 기반) 추천
 
 
-## 시작 가이드
-### Requirements
-For building and running the application you need:
+## How to build
+#### AWS Server Requirements
 
-- [Node.js 14.19.3](https://nodejs.org/ca/blog/release/v14.19.3/)
-- [Npm 9.2.0](https://www.npmjs.com/package/npm/v/9.2.0)
-- [Strapi 3.6.6](https://www.npmjs.com/package/strapi/v/3.6.6)
+- EC2 : Ubuntu 버전명
 
-### Installation
+#### Installation
 ``` bash
-$ git clone https://github.com/Voluntain-SKKU/Voluntain-2nd.git
-$ cd Voluntain-2nd
+$ git clone https://github.com/Team-hwaE/Capston_hwa_E.git
+$ cd Capston_hwa_E
 ```
 #### Backend
 ```
-$ cd strapi-backend
-$ nvm use v.14.19.3
-$ npm install
-$ npm run develop
+$ pip3 install flask 
+$ pip3 install pymysql
+$ pip3 install numpy pandas matplotlib scikit-learn
 ```
 
 #### Frontend
 ```
-$ cd voluntain-app
-$ nvm use v.14.19.3
-$ npm install 
-$ npm run dev
+$ python3 application.py
 ```
 
 ---
@@ -65,25 +59,39 @@ $ npm run dev
 
 ### Environment
 ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-007ACC?style=for-the-badge&logo=Visual%20Studio%20Code&logoColor=white)
+![Jupyter Notebook](https://img.shields.io/badge/jupyter-%23FA0F00.svg?style=for-the-badge&logo=jupyter&logoColor=white)
 ![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=Git&logoColor=white)
-![Github](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white)             
-
-### Config
-![npm](https://img.shields.io/badge/npm-CB3837?style=for-the-badge&logo=npm&logoColor=white)        
+![Github](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=GitHub&logoColor=white)
+![AWS](https://img.shields.io/badge/AWS-%23FF9900.svg?style=for-the-badge&logo=amazon-aws&logoColor=white)   
 
 ### Development
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=Javascript&logoColor=white)
-![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Strapi](https://img.shields.io/badge/Strapi-2F2E8B?style=for-the-badge&logo=Strapi&logoColor=white)
-![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=Next.js&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=for-the-badge&logo=Bootstrap&logoColor=white)
-![Material UI](https://img.shields.io/badge/Material%20UI-007FFF?style=for-the-badge&logo=MUI&logoColor=white)
+![Python](https://img.shields.io/badge/python-3670A0?style=for-the-badge&logo=python&logoColor=ffdd54)
+![Flask](https://img.shields.io/badge/flask-%23000.svg?style=for-the-badge&logo=flask&logoColor=white)
+
+### Database
+![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
+
+### Machine Learning
+![NumPy](https://img.shields.io/badge/numpy-%23013243.svg?style=for-the-badge&logo=numpy&logoColor=white)
+![Pandas](https://img.shields.io/badge/pandas-%23150458.svg?style=for-the-badge&logo=pandas&logoColor=white)
+![Matplotlib](https://img.shields.io/badge/Matplotlib-%23ffffff.svg?style=for-the-badge&logo=Matplotlib&logoColor=black)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-%23F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
 ### Communication
 ![Notion](https://img.shields.io/badge/Notion-000000?style=for-the-badge&logo=Notion&logoColor=white)
-![GoogleMeet](https://img.shields.io/badge/GoogleMeet-00897B?style=for-the-badge&logo=Google%20Meet&logoColor=white)
 
+### Collect data
+[Incidecoder](https://incidecoder.com/) <br>
+[대한화장품협회 성분사전](https://kcia.or.kr/cid/main/)
 
+* Schema: The schema includes tables for users, Projects, userIngredients and product. <br>
+* Data Tables - <br>
+  user: userID, email, productID, fitness <br>
+  userIngredients: fields like userID, ingredientsList <br>
+  product : fields like ProductID, productName, productIngredients, categoryID, productCategory, traslated_productName
 
 
 ## 화면 구성 📺
@@ -101,6 +109,10 @@ $ npm run dev
 
 
 ---
+### 기능 흐름도
+<img width="825" alt="image" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/80f57382-6b2e-4ed5-b702-80fcc222bcd3">
+
+---
 ## 주요 기능 📦
 
 ### ⭐️ 성분프렌즈 (유사 사용자 기반) 추천
@@ -112,6 +124,27 @@ $ npm run dev
 - 성분 벡터화 후 2차원 축소한 피처공간
 - 유저 성분리스트와의 최소 유클리드 거리에 위치하는 성분 유사 제품 추천
 
+---
+## 서브 기능 📦
+
+### ⭐️ 기존 화장품 입력
+- 사용자가 입력한 화장품을 user table 에서 조회
+- 입력 팝업창에서 화장품 이름을 검색하면 적합/부적합 여부를 선택하여 등록함
+- 추가/삭제 기능
+- 추가/삭제가 일어나면 성분리스트가 업데이트됨
+```
+@application.route("/insert_product", methods=["POST"])
+@application.route("/delete_product/<int:product_id>")
+def update_user_ingredient():
+```
+  
+### ⭐️ 성분 프렌즈 화장품 조회
+- 성분프렌즈 추천 결과 화면이 출력된 경우, 3명의 성분 프렌즈가 검색됨을 의미
+- 해당 프렌즈들이 입력한 화장품 목록을 조회하는 기능
+```
+@application.route('/Select_friend')
+@application.route('/View_friend/<int:userID>')
+```
 ---
 ## 아키텍쳐
 
@@ -126,8 +159,8 @@ $ npm run dev
 │   ├── image/ : 이미지 저장 폴더
 │   │   ├── bichon03.png : 성분프렌즈 프로필 이미지
 │   │   ├── frenh03.png : 성분프렌즈 프로필 이미지
-│   │   ├── welsh02.png : 성분프렌즈 프로필 이미지
-│   └──── server.js : 서버 설정 정보 파일
+│   └────── welsh02.png : 성분프렌즈 프로필 이미지
+│   
 │
 ├── templates/ : 프론트엔드 화면
 │   ├── home.html : 메인 화면
@@ -139,7 +172,7 @@ $ npm run dev
 │   ├── Select_category.html : 카테고리 선택화면
 │   ├── Select_friend.html : 성분프렌즈 조회화면
 │   └── View_friend.html : 성분프렌즈 화장품 조회화면
-│   │
+│   
 ├── application.py : flask 어플리케이션 구현
 ├── database.py : mysql 연결정보, 조회 기능
 ├── clustering.ipnyb : 에디터 추천 기능 - 화장품 성분 기준 군집화 모델 생성 및 인덱스 추출 코드
@@ -151,6 +184,46 @@ $ npm run dev
 
 
 ```
+<img width="872" alt="스크린샷 2024-06-14 오후 7 46 34" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/dcf46ab2-1e97-48c6-adf2-13619567762b">
 
+---
+## How to Install (AWS 설정 과정 설명)
+아래는 예시임
+Provision AWS Resources:
 
+Create an EC2 instance for the application server.
+Set up an RDS instance for the database.
+Configure S3 buckets for file storage if needed.
+Use AWS Elastic Beanstalk or ECS for containerized deployments.
+Deploy Application:
+
+SSH into your EC2 instance.
+Clone the repository and install dependencies.
+Build the application for production.
+Set up environment variables (e.g., database connection strings, AWS keys).
+Run the application on the EC2 instance.
+Set Up Networking:
+
+Configure security groups to allow traffic on necessary ports.
+Set up a load balancer if needed.
+Point your domain to the EC2 instance using Route 53.
+Automate with CI/CD:
+
+---
+## Description of Sample Data
+1. demo 사용자
+   선택 제품 : loccitane-immortelle-precious-cream, summecosmetics-s-cell-c-antiage-double-action-cream
+2. 유사 사용자 1
+   선택 제품 : loccitane-immortelle-precious-cream, summecosmetics-s-cell-c-antiage-double-action-cream, ponds-nourishing-moisturizing-cream
+3. 유사 사용자 2
+   선택 제품 : loccitane-immortelle-precious-cream, summecosmetics-s-cell-c-antiage-double-action-cream, senka-aqua-bright-glow-gel-cream
+4. 유사 사용자 3
+   선택 제품 : loccitane-immortelle-precious-cream, summecosmetics-s-cell-c-antiage-double-action-cream, natura-bisse-inhibit-tensolift-neck-cream
+---
+## How to Test
+1. 웹 서버 접속 : 주소 입력
+2. 데모 계정 접속 : 'demo@gmail.com' 입력
+3. 사용자의 화장품 입력/삭제 : ex) 겔랑 슈퍼 아쿠아 세럼 라이트
+4. 카테고리 선택 : 스킨케어/선케어/클렌징/마스크팩
+5. 추천 결과 조회
 
