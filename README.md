@@ -20,7 +20,7 @@
 
 ## 배포 주소
 
-> **웹 페이지 주소 ** : [http:~~~](http://~~/) <br>
+> 웹 페이지 주소 : [http://ec2-3-80-183-199.compute-1.amazonaws.com:3000](http://ec2-3-80-183-199.compute-1.amazonaws.com:3000) <br>
 * 테스트 계정 : demo@gmail.com 
 > **로컬 주소** : [http://127.0.0.1:3000/]
 
@@ -34,7 +34,7 @@
 ## How to build
 #### AWS Server Requirements
 
-- EC2 : Ubuntu 버전명
+- EC2 : Ubuntu server 22.04 LTS
 
 #### Installation
 ``` bash
@@ -46,6 +46,10 @@ $ cd Capston_hwa_E
 $ pip3 install flask 
 $ pip3 install pymysql
 $ pip3 install numpy pandas matplotlib scikit-learn
+```
+```
+1. mysql workbench에서 connection을 셋업한다 (Address 127.0.0.1/3000)
+2. mysql_table.zip의 table 파일을 import해서 로컬에 데이터베이스를 세팅한다.
 ```
 
 #### Frontend
@@ -88,10 +92,10 @@ $ python3 application.py
 [대한화장품협회 성분사전](https://kcia.or.kr/cid/main/)
 
 * Schema: The schema includes tables for users, Projects, userIngredients and product. <br>
-* Data Tables - <br>
-  user: userID, email, productID, fitness <br>
-  userIngredients: fields like userID, ingredientsList <br>
-  product : fields like ProductID, productName, productIngredients, categoryID, productCategory, traslated_productName
+* Data Tables : <br>
+  * user - userID, email, productID, fitness <br>
+  * userIngredients - userID, ingredientsList <br>
+  * product - ProductID, productName, productIngredients, categoryID, productCategory, translated_productName
 
 
 ## 화면 구성 📺
@@ -188,26 +192,84 @@ def update_user_ingredient():
 
 ---
 ## How to Install (AWS 설정 과정 설명)
-아래는 예시임
-Provision AWS Resources:
 
-Create an EC2 instance for the application server.
-Set up an RDS instance for the database.
-Configure S3 buckets for file storage if needed.
-Use AWS Elastic Beanstalk or ECS for containerized deployments.
-Deploy Application:
+### 1.	AWS EC2 생성
 
-SSH into your EC2 instance.
-Clone the repository and install dependencies.
-Build the application for production.
-Set up environment variables (e.g., database connection strings, AWS keys).
-Run the application on the EC2 instance.
-Set Up Networking:
+aws를 검색해서 홈페이지에 들어갑니다. 홈페이지에 들어가서 우측 상단에 있는 콘솔에 로그인을 눌러 로그인을 합니다. 로그인 후 콘솔 홈에서 EC2에 들어갑니다. EC2 페이지에서 인스턴스 시작 버튼을 누릅니다. <br>
+#### (1)	인스턴스 이름 설정, AMI 선택<br>
+이름을 설정해주고, AMI는 Ubuntu를 선택합니다. Ubuntu 중에도 많은 종류가 있지만, 무료로 이용할 것이라면 프리 티어 사용 가능을 선택해야 합니다. 프리 티어로 사용 가능한 Ubuntu Server 24.04 LTS를 선택합니다. 인스턴스 유형도 프리 티어 사용 가능한 t2.micro를 선택합니다. <br>
+#### (2)	키 페어 등록<br>
+키 페어가 없다면 생성해서 키 페어를 등록합니다. 생성한 키 페어는 인스턴스에 접속할 때마다 사용해야 하기에 위치와 비밀번호를 기억해 두어야 합니다.
+인스턴스 이름 설정, AMI 선택 그리고 키페어 등록을 완료한 뒤 인스턴스 시작 버튼을 누르면 AWS EC2를 생성하게 됩니다. <br>
 
-Configure security groups to allow traffic on necessary ports.
-Set up a load balancer if needed.
-Point your domain to the EC2 instance using Route 53.
-Automate with CI/CD:
+### 2. 인스턴스 연결<br><br>
+
+#### (1)	접속할 주소 확인<br>
+
+인스턴스 연결 페이지에 들어가서 하단에 있는 ‘예’ 링크를 복사하면 키페어 부분만 따옴표 처리로 되어있는데, 그 부분에 방금 전 생성한 키 페어 주소를 복사해서 링크를 수정해 넣으면 됩니다. 
+<br>
+#### (2)	터미널에서 접속<br>
+
+터미널에서 ssh 명령문을 통해 AWS ubuntu server에 접속합니다. <br>
+
+### 3. Ubuntu에 mySQL 설치+workbench와 연결<br><br>
+
+ 먼저 Ubuntu에 mySQL을 설치합니다. <br>
+
+#### (1)	시스템 패키지 목록 업데이트<br>
+
+인스턴스에 접속한 상태로 시스템 패키지 목록을 업데이트합니다. 
+sudo apt update
+(다음 명령문을 통해 시스템 패키지 목록을 업데이트할 수 있습니다. )
+<br><br>
+#### (2)	MySQL 서버 설치, 설정<br>
+
+MySQL 서버 패키지를 설치합니다. 
+sudo apt install mysql-server -y
+(다음 명령문을 통해 MySQL 서버 패키지를 설치할 수 있습니다.)
+설치를 완료한 후에는 외부에서 mySQL에 접근 가능하도록 설정해야 합니다.
+터미널에서 MySQL 설정 파일을 엽니다. 이때 SSH로 연결된 상태에서 진행해야 합니다. <br><br>
+
+~$ cd /etc/mysql/mysql.conf.d
+$ sudo vi mysqld.cnf
+터미널에서 해당 명령어를 입력하고 기존 bind-address가 127.0.0.1로 되어 있는 부분을 0.0.0.0으로 바꿔줍니다. 
+
+‘i’를 눌러 입력 모드로 진입하고, [mysqld] 섹션 아래에 bind-address = 0.0.0.0으로 수정해둡니다.
+입력이 끝난 뒤에는 ‘ESC’를 눌러 명령 모드로 돌아간 뒤 ‘:wq’를 입력하고 엔터 키를 눌러 파일을 저장하고 종료합니다. 
+
+#### (3)	MySQL에서 사용할 계정 생성<br>
+
+mysql -u root -p
+을 통해 mySQL에 접속해 사용할 계정을 생성해 보겠습니다. 
+
+create user ‘계정이름’@’localhost’ identified by ‘비밀번호’;
+grant all privileges on *.* to '계정이름'@'localhost' with grant option;
+flush privileges;
+
+계정을 생성하고 권한을 부여합니다. 
+
+#### (4)	인스턴스 보안 설정<br>
+
+다시 aws에 돌아가서 인스턴스 보안 페이지로 갑니다. 인바운드 규칙 편집 버튼을 눌러 3306 포트로 접근이 가능하도록 합니다. 
+
+규칙 추가 버튼을 누르고, MySQL/Aurora 3306 0.0.0.0/0를 선택하고, 규칙 저장 버튼을 누릅니다. 
+
+#### (5)	Workbench 설정<br>
+
+workbench를 열고 연결할 connection에서 Edit connection을 선택해주면 Manage Server Connections 창이 뜹니다. 
+
+•	Connection Name: 원하는 이름으로 정해줍니다.<br>
+•	Connection Method: Standard TCP/IP over SSH로 설정해줍니다.<br>
+•	SSH Hostname: 인스턴스의 퍼블릭 IPv4 DNS를 입력해주면 됩니다.     <br>                                                                                      ( AWS에서 EC2>인스턴스>인스턴스 ID 누르면 인스턴스 요약 나오는데 거기에 퍼블릭 IPv4 DNS 있습니다.)<br>
+•	SSH Username: ubuntu를 입력해줍니다.<br>
+•	SSH Key File: 인스턴스 생성할 때 만들었던 키 체인 파일 넣어주면 됩니다.<br>
+•	MySQL Hostname: 0.0.0.0 입력해줍니다.<br>
+•	MySQL Server Port: 3306 입력해줍니다.<br>
+•	Username: 아까 mySQL에서 생성한 계정의 '계정이름'을 넣어줍니다.<br>
+•	password: Store in Keychain을 누르고 설정한 '비밀번호'를 입력합니다.<br>
+입력하고 ok 버튼을 누른 뒤에 Test Connection 버튼을 누릅니다. 연결에 성공하면 창에 Successfully made the MySQL connection이 뜹니다. <br>
+
+
 
 ---
 ## Description of Sample Data
@@ -221,7 +283,7 @@ Automate with CI/CD:
    선택 제품 : loccitane-immortelle-precious-cream, summecosmetics-s-cell-c-antiage-double-action-cream, natura-bisse-inhibit-tensolift-neck-cream
 ---
 ## How to Test
-1. 웹 서버 접속 : 주소 입력
+1. 웹 서버 접속 : http://127.0.0.1:3000 or http://ec2-3-80-183-199.compute-1.amazonaws.com:3000 주소 입력
 2. 데모 계정 접속 : 'demo@gmail.com' 입력
 3. 사용자의 화장품 입력/삭제 : ex) 겔랑 슈퍼 아쿠아 세럼 라이트
 4. 카테고리 선택 : 스킨케어/선케어/클렌징/마스크팩
