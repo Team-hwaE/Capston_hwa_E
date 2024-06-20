@@ -20,9 +20,9 @@
 
 ## 배포 주소
 
-> 웹 페이지 주소 : [http://ec2-3-80-183-199.compute-1.amazonaws.com:3000](http://ec2-3-80-183-199.compute-1.amazonaws.com:3000) <br>
+> 웹 페이지 주소 : http://EC2_퍼블릭_IP_주소:3000 <br>
 * 테스트 계정 : demo@gmail.com 
-> **로컬 주소** : [http://127.0.0.1:3000/]
+> **로컬 주소** : http://127.0.0.1:3000/
 
 ## 프로젝트 소개
 
@@ -193,81 +193,183 @@ def update_user_ingredient():
 ---
 ## How to Install
 
-### 1.	AWS EC2 생성
+## 1.	AWS EC2 생성<br><br>
 
 aws를 검색해서 홈페이지에 들어갑니다. 홈페이지에 들어가서 우측 상단에 있는 콘솔에 로그인을 눌러 로그인을 합니다. 로그인 후 콘솔 홈에서 EC2에 들어갑니다. EC2 페이지에서 인스턴스 시작 버튼을 누릅니다. <br>
-#### (1)	인스턴스 이름 설정, AMI 선택<br>
+
+### (1)	인스턴스 이름 설정, AMI 선택<br>
+
 이름을 설정해주고, AMI는 Ubuntu를 선택합니다. Ubuntu 중에도 많은 종류가 있지만, 무료로 이용할 것이라면 프리 티어 사용 가능을 선택해야 합니다. 프리 티어로 사용 가능한 Ubuntu Server 24.04 LTS를 선택합니다. 인스턴스 유형도 프리 티어 사용 가능한 t2.micro를 선택합니다. <br>
-#### (2)	키 페어 등록<br>
+
+### (2)	키 페어 등록<br>
+
 키 페어가 없다면 생성해서 키 페어를 등록합니다. 생성한 키 페어는 인스턴스에 접속할 때마다 사용해야 하기에 위치와 비밀번호를 기억해 두어야 합니다.
 인스턴스 이름 설정, AMI 선택 그리고 키페어 등록을 완료한 뒤 인스턴스 시작 버튼을 누르면 AWS EC2를 생성하게 됩니다. <br>
 
-### 2. 인스턴스 연결<br><br>
+## 2. 인스턴스 연결<br><br>
 
-#### (1)	접속할 주소 확인<br>
+### (1)	접속할 주소 확인<br>
 
-인스턴스 연결 페이지에 들어가서 하단에 있는 ‘예’ 링크를 복사하면 키페어 부분만 따옴표 처리로 되어있는데, 그 부분에 방금 전 생성한 키 페어 주소를 복사해서 링크를 수정해 넣으면 됩니다. 
+인스턴스 연결 페이지에 들어가서 하단에 있는 ‘예’ 링크를 복사하면 키페어 부분만 따옴표 처리로 되어있는데, 그 부분에 방금 전 생성한 키 페어 주소를 복사해서 링크를 수정해 넣으면 됩니다.
 <br>
-#### (2)	터미널에서 접속<br>
+
+### (2)	터미널에서 접속<br>
 
 터미널에서 ssh 명령문을 통해 AWS ubuntu server에 접속합니다. <br>
 
-### 3. Ubuntu에 mySQL 설치+workbench와 연결<br><br>
+## 3. Ubuntu에 mySQL 설치+workbench와 연결<br><br>
 
- 먼저 Ubuntu에 mySQL을 설치합니다. <br>
+먼저 Ubuntu에 mySQL을 설치합니다. <br>
 
-#### (1)	시스템 패키지 목록 업데이트<br>
+### (1)	시스템 패키지 목록 업데이트<br>
 
-인스턴스에 접속한 상태로 시스템 패키지 목록을 업데이트합니다. 
+인스턴스에 접속한 상태로 시스템 패키지 목록을 업데이트합니다.
 sudo apt update
 (다음 명령문을 통해 시스템 패키지 목록을 업데이트할 수 있습니다. )
 <br><br>
-#### (2)	MySQL 서버 설치, 설정<br>
 
-MySQL 서버 패키지를 설치합니다. 
+### (2)	MySQL 서버 설치, 설정<br>
+
+MySQL 서버 패키지를 설치합니다.
+
+```bash
 sudo apt install mysql-server -y
+```
+
 (다음 명령문을 통해 MySQL 서버 패키지를 설치할 수 있습니다.)
 설치를 완료한 후에는 외부에서 mySQL에 접근 가능하도록 설정해야 합니다.
 터미널에서 MySQL 설정 파일을 엽니다. 이때 SSH로 연결된 상태에서 진행해야 합니다. <br><br>
 
+```bash
 ~$ cd /etc/mysql/mysql.conf.d
 $ sudo vi mysqld.cnf
-터미널에서 해당 명령어를 입력하고 기존 bind-address가 127.0.0.1로 되어 있는 부분을 0.0.0.0으로 바꿔줍니다. 
+```
+
+터미널에서 해당 명령어를 입력하고 기존 bind-address가 127.0.0.1로 되어 있는 부분을 0.0.0.0으로 바꿔줍니다.
 
 ‘i’를 눌러 입력 모드로 진입하고, [mysqld] 섹션 아래에 bind-address = 0.0.0.0으로 수정해둡니다.
-입력이 끝난 뒤에는 ‘ESC’를 눌러 명령 모드로 돌아간 뒤 ‘:wq’를 입력하고 엔터 키를 눌러 파일을 저장하고 종료합니다. 
+입력이 끝난 뒤에는 ‘ESC’를 눌러 명령 모드로 돌아간 뒤 ‘:wq’를 입력하고 엔터 키를 눌러 파일을 저장하고 종료합니다.
 
-#### (3)	MySQL에서 사용할 계정 생성<br>
+### (3)	MySQL에서 사용할 계정 생성<br>
 
+```bash
 mysql -u root -p
-을 통해 mySQL에 접속해 사용할 계정을 생성해 보겠습니다. 
+```
 
+을 통해 mySQL에 접속해 사용할 계정을 생성해 보겠습니다.
+
+```bash
 create user ‘계정이름’@’localhost’ identified by ‘비밀번호’;
 grant all privileges on *.* to '계정이름'@'localhost' with grant option;
 flush privileges;
+```
 
-계정을 생성하고 권한을 부여합니다. 
+계정을 생성하고 권한을 부여합니다.
 
-#### (4)	인스턴스 보안 설정<br>
+### (4)	인스턴스 보안 설정<br>
 
-다시 aws에 돌아가서 인스턴스 보안 페이지로 갑니다. 인바운드 규칙 편집 버튼을 눌러 3306 포트로 접근이 가능하도록 합니다. 
+다시 aws에 돌아가서 인스턴스 보안 페이지로 갑니다. 인바운드 규칙 편집 버튼을 눌러 3306 포트로 접근이 가능하도록 합니다.
 
-규칙 추가 버튼을 누르고, MySQL/Aurora 3306 0.0.0.0/0를 선택하고, 규칙 저장 버튼을 누릅니다. 
+규칙 추가 버튼을 누르고, MySQL/Aurora 3306 0.0.0.0/0를 선택하고, 규칙 저장 버튼을 누릅니다.
 
-#### (5)	Workbench 설정<br>
+### (5)	Workbench 설정<br>
 
-workbench를 열고 연결할 connection에서 Edit connection을 선택해주면 Manage Server Connections 창이 뜹니다. 
+workbench를 열고 연결할 connection에서 Edit connection을 선택해주면 Manage Server Connections 창이 뜹니다.
 
-  •	Connection Name: 원하는 이름으로 정해줍니다.<br>
-  •	Connection Method: Standard TCP/IP over SSH로 설정해줍니다.<br>
-  •	SSH Hostname: 인스턴스의 퍼블릭 IPv4 DNS를 입력해주면 됩니다.     <br>                                                                                      ( AWS에서 EC2>인스턴스>인스턴스 ID 누르면 인스턴스 요약 나오는데 거기에 퍼블릭 IPv4 DNS 있습니다.)<br>
-  •	SSH Username: ubuntu를 입력해줍니다.<br>
-  •	SSH Key File: 인스턴스 생성할 때 만들었던 키 체인 파일 넣어주면 됩니다.<br>
-  •	MySQL Hostname: 0.0.0.0 입력해줍니다.<br>
-  •	MySQL Server Port: 3306 입력해줍니다.<br>
-  •	Username: 아까 mySQL에서 생성한 계정의 '계정이름'을 넣어줍니다.<br>
-  •	password: Store in Keychain을 누르고 설정한 '비밀번호'를 입력합니다. 입력하고 ok 버튼을 누른 뒤에 Test Connection 버튼을 누릅니다. 연결에 성공하면 창에 Successfully made the MySQL connection이 뜹니다. <br>
+- Connection Name: 원하는 이름으로 정해줍니다.<br>
+•	Connection Method: Standard TCP/IP over SSH로 설정해줍니다.<br>
+•	SSH Hostname: 인스턴스의 퍼블릭 IPv4 DNS를 입력해주면 됩니다. <br> ( AWS에서 EC2>인스턴스>인스턴스 ID 누르면 인스턴스 요약 나오는데 거기에 퍼블릭 IPv4 DNS 있습니다.)<br>
+•	SSH Username: ubuntu를 입력해줍니다.<br>
+•	SSH Key File: 인스턴스 생성할 때 만들었던 키 체인 파일 넣어주면 됩니다.<br>
+•	MySQL Hostname: 0.0.0.0 입력해줍니다.<br>
+•	MySQL Server Port: 3306 입력해줍니다.<br>
+•	Username: 아까 mySQL에서 생성한 계정의 '계정이름'을 넣어줍니다.<br>
+•	password: Store in Keychain을 누르고 설정한 '비밀번호'를 입력합니다. 입력하고 ok 버튼을 누른 뒤에 Test Connection 버튼을 누릅니다. 연결에 성공하면 창에 Successfully made the MySQL connection이 뜹니다. <br>
 
+## 4. 소스코드 설치<br><br>
+
+먼저 깃주소에서 전체 프로젝트를 다운로드 후 압축해제합니다. 하단 파일의 압축도 해제해야합니다.<br>
+
+### (1) Mysql 테이블 및 데이터 설치<br>
+
+이전 단계에서 생성한 connection에 접속 후<br>
+
+Workbench에서 데이터를 삽입하기 위해 데이터베이스를 생성합니다.<br>
+
+```bash
+CREATE DATABASE ‘db이름’;
+```
+
+MySQL workbench를 열고 Server에서 Data Import 버튼을 누릅니다. 삽입할 데이터 mysql_table.zip을 압축해제한 폴더를 선택한 뒤 Start Import 버튼을 누르면 다운 받은 데이터를 삽입할 수 있습니다.<br>
+
+### (2) AWS EC2에 소스코드 설치<br>
+
+다운로드한 파일 중 clustering.ipynb, mysql_table.zip, product.csv를 제외하고 모두 ec2에 업로드합니다.<br>
+
+```bash
+scp -i /경로/키파일.pem /로컬/파일/경로 ubuntu@EC2_퍼블릭_IP_주소:/home/ubuntu/원하는/원격/경로
+```
+
+다음 명령어를 통해 원하는 파일을 업로드할 수 있습니다. 다운로드한 파일 전체를 폴더로 묶어 폴더 전체를 ec2에 업로드하면 서버에서 실행시킬 때도 간단하게 파일을 찾을 수 있습니다. 
+<br>
+파일을 업로드한 뒤 서버에서도 파일을 실행시키는 데에 필요한 라이브러리를 설치합니다.<br>
+
+flask를 설치하기 위해 
+
+```bash
+pip3 install flask
+```
+
+pymysql을 설치하기 위해
+
+```bash
+pip3 install pymysql
+```
+
+mysql.connector를 설치하기 위해
+
+```bash
+pip3 install mysql-connector-python
+```
+
+python을 설치하기 위해
+
+```bash
+pip3 install python
+```
+
+다음의 명령어를 통해 필요한 라이브러리를 모두 설치합니다. <br>
+
+## 5. 서버 접속<br><br>
+
+먼저 aws 웹페이지에서 생성한 ec2 인스턴스를 실행시켜야 합니다. 인스턴스 페이지에서 생성한 인스턴스를 선택하고 실행 시작 버튼을 누릅니다. 인스턴스를 실행시키면 퍼블릭 IPv4 DNS가 나옵니다.  <br>
+
+```bash
+scp -i /경로/키파일.pem /로컬/파일/경로 ubuntu@EC2_퍼블릭_IP_주소
+```
+
+를 터미널에 입력하면 생성한 서버에 접속할 수 있습니다.<br>
+
+## 6. 실행<br><br>
+
+서버에 접속한 상태에서 업로드한 파일의 application을 실행합니다. <br>
+
+```bash
+cd /home/ubuntu/파일 경로
+python3 application.py
+```
+
+를 터미널에 입력하면 application을 실행시킬 수 있습니다. <br>
+
+웹페이지에서 접속하고 싶다면 인스턴스를 실행시키면서 설정된 퍼블릭 IPv2 DNS로 접속하면 됩니다.<br>
+
+주소는<br>
+
+```bash
+http://EC2_퍼블릭_IP_주소:3000
+```
+
+입니다.
 
 
 ---
