@@ -34,7 +34,7 @@
 ## How to build
 #### AWS Server Requirements
 
-- EC2 : Ubuntu server 22.04 LTS
+- EC2 : Ubuntu server 24.04 LTS
 
 #### Installation
 ``` bash
@@ -191,7 +191,7 @@ def update_user_ingredient():
 <img width="872" alt="스크린샷 2024-06-14 오후 7 46 34" src="https://github.com/Team-hwaE/Capston_hwa_E/assets/87376242/dcf46ab2-1e97-48c6-adf2-13619567762b">
 
 ---
-## How to Install (AWS 설정 과정 설명)
+## How to Install
 
 ### 1.	AWS EC2 생성
 
@@ -258,16 +258,15 @@ flush privileges;
 
 workbench를 열고 연결할 connection에서 Edit connection을 선택해주면 Manage Server Connections 창이 뜹니다. 
 
-•	Connection Name: 원하는 이름으로 정해줍니다.<br>
-•	Connection Method: Standard TCP/IP over SSH로 설정해줍니다.<br>
-•	SSH Hostname: 인스턴스의 퍼블릭 IPv4 DNS를 입력해주면 됩니다.     <br>                                                                                      ( AWS에서 EC2>인스턴스>인스턴스 ID 누르면 인스턴스 요약 나오는데 거기에 퍼블릭 IPv4 DNS 있습니다.)<br>
-•	SSH Username: ubuntu를 입력해줍니다.<br>
-•	SSH Key File: 인스턴스 생성할 때 만들었던 키 체인 파일 넣어주면 됩니다.<br>
-•	MySQL Hostname: 0.0.0.0 입력해줍니다.<br>
-•	MySQL Server Port: 3306 입력해줍니다.<br>
-•	Username: 아까 mySQL에서 생성한 계정의 '계정이름'을 넣어줍니다.<br>
-•	password: Store in Keychain을 누르고 설정한 '비밀번호'를 입력합니다.<br>
-입력하고 ok 버튼을 누른 뒤에 Test Connection 버튼을 누릅니다. 연결에 성공하면 창에 Successfully made the MySQL connection이 뜹니다. <br>
+  •	Connection Name: 원하는 이름으로 정해줍니다.<br>
+  •	Connection Method: Standard TCP/IP over SSH로 설정해줍니다.<br>
+  •	SSH Hostname: 인스턴스의 퍼블릭 IPv4 DNS를 입력해주면 됩니다.     <br>                                                                                      ( AWS에서 EC2>인스턴스>인스턴스 ID 누르면 인스턴스 요약 나오는데 거기에 퍼블릭 IPv4 DNS 있습니다.)<br>
+  •	SSH Username: ubuntu를 입력해줍니다.<br>
+  •	SSH Key File: 인스턴스 생성할 때 만들었던 키 체인 파일 넣어주면 됩니다.<br>
+  •	MySQL Hostname: 0.0.0.0 입력해줍니다.<br>
+  •	MySQL Server Port: 3306 입력해줍니다.<br>
+  •	Username: 아까 mySQL에서 생성한 계정의 '계정이름'을 넣어줍니다.<br>
+  •	password: Store in Keychain을 누르고 설정한 '비밀번호'를 입력합니다. 입력하고 ok 버튼을 누른 뒤에 Test Connection 버튼을 누릅니다. 연결에 성공하면 창에 Successfully made the MySQL connection이 뜹니다. <br>
 
 
 
